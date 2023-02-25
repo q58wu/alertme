@@ -10,7 +10,7 @@ class AlertFields {
   static const String title = 'title';
   static const String isImportant = 'isImportant';
   static const String description = 'description';
-  static const String setTime = 'tim:wqe';
+  static const String setTime = 'setTime';
   static const String expireTime = 'expireTime';
 }
 
