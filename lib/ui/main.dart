@@ -1,5 +1,6 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
+import 'package:alert_me/ui/add_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,7 +19,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'AlertMe',
       theme: ThemeData(
-        primarySwatch: Colors.grey,
+        primarySwatch: Colors.green,
       ),
       home: const MyHomePage(title: 'AlertMe'),
     );
@@ -53,23 +54,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Future refreshAllAlerts() async {
     setState(() => isLoading = true);
 
-    this.allAlert = await AlarmDatabase.instance.readAllAlerts();
+    allAlert = await AlarmDatabase.instance.readAllAlerts();
 
     setState(() {
       isLoading = false;
-    });
-  }
-
-  void _addAlert() {
-    setState(() {
-      final newAlert = Alert(
-          isImportant: true,
-          title: "random",
-          description: "random alarm",
-          setTime: DateTime(2020, 7, 7, 19),
-          expireTime: DateTime(2023, 7, 7, 19));
-
-      AlarmDatabase.instance.create(newAlert);
     });
   }
 
@@ -124,7 +112,11 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: allAlert.length,
       )),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addAlert,
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => AddAlertPage()),
+          );
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

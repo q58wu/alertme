@@ -43,15 +43,6 @@ class AlarmDatabase {
 
   Future<Alert> create(Alert alert) async {
     final db = await instance.database;
-
-    // final json = note.toJson();
-    // final columns =
-    //     '${NoteFields.title}, ${NoteFields.description}, ${NoteFields.time}';
-    // final values =
-    //     '${json[NoteFields.title]}, ${json[NoteFields.description]}, ${json[NoteFields.time]}';
-    // final id = await db
-    //     .rawInsert('INSERT INTO table_name ($columns) VALUES ($values)');
-
     final id = await db.insert(tableAlert, alert.toJson());
     return alert.copy(id: id);
   }
@@ -76,9 +67,7 @@ class AlarmDatabase {
   Future<List<Alert>> readAllAlerts() async {
     final db = await instance.database;
 
-    final orderBy = '${AlertFields.expireTime} ASC';
-    // final result =
-    //     await db.rawQuery('SELECT * FROM $tableNotes ORDER BY $orderBy');
+    const orderBy = '${AlertFields.expireTime} ASC';
 
     final result = await db.query(tableAlert, orderBy: orderBy);
 
