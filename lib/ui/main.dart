@@ -20,7 +20,7 @@ class MainApp extends StatelessWidget {
       title: 'AlertMe',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        /*useMaterial3: true*/
+        fontFamily: 'Shantell_Sans'
       ),
       home: const MyHomePage(title: 'AlertMe'),
     );
@@ -71,14 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
           caption: 'Renew',
           color: Colors.blue,
           icon: Icons.access_time_filled,
-          onTap: () {
-            print('SlidableActionWidget pressed ...');
-          },
+          onTap: () {},
         ),
       ],
       child: ListTile(
         leading: const FaIcon(
-          FontAwesomeIcons.airFreshener,
+          FontAwesomeIcons.airbnb,
         ),
         title: Text(
           currentAlert.title,
@@ -88,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
           TimeUtil.convertDatetimeToYMMMED(currentAlert.expireTime),
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        trailing: Icon(
+        trailing: const Icon(
           Icons.alarm,
           color: Colors.grey,
           size: 20,
@@ -114,11 +112,14 @@ class _MyHomePageState extends State<MyHomePage> {
       )),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AddAlertPage()),
-          );
+          await Navigator.of(context)
+              .push(
+                MaterialPageRoute(builder: (context) => AddAlertPage()),
+              )
+              .then((value) => setState(() {
+                    refreshAllAlerts();
+                  }));
         },
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

@@ -18,6 +18,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
   String description = '';
   DateTime date = DateTime.now();
   bool isImportant = false;
+  bool needToRepeat = false;
   int daysToRepeat = 0;
   //int monthsToRepeat = 0; // unused
   int weekToRepeat = 0;
@@ -84,6 +85,10 @@ class _AddAlertPageState extends State<AddAlertPage> {
                           },
                           maxLines: 5,
                         ),
+                        Divider(
+                          height: 20,
+                          color: Theme.of(context).colorScheme.background,
+                        ),
                         FormDatePicker(
                           date: date,
                           onChanged: (value) {
@@ -92,30 +97,40 @@ class _AddAlertPageState extends State<AddAlertPage> {
                             });
                           },
                         ),
+                        Divider(
+                          height: 20,
+                          color: Theme.of(context).colorScheme.background,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text('Repeat every',
+                            Text('Repeat?',
                                 style: Theme.of(context).textTheme.bodyLarge),
-                            /*TextButton(
-                              child: Text('$monthsToRepeat Month(s)'),
-                              onPressed: () async {
-                                  Picker(
-                                      adapter: PickerDataAdapter<int>(
-                                          pickerData: [1,2,3,4,5,6,7,8,9,10,11,12]
-                                      ),
-                                      changeToFirst: true,
-                                      hideHeader: false,
-                                      onConfirm: (Picker picker, List value) {
-                                        setState(() {
-                                          monthsToRepeat = picker.getSelectedValues()[0];
-                                        });
-                                      }
-                                  ).showModal(this.context);
+                            Switch(
+                              value: needToRepeat,
+                              onChanged: (enabled) {
+                                setState(() {
+                                  needToRepeat = enabled;
+                                });
                               },
-                            ),*/
-                            TextButton(
+                            ),
+                          ],
+                        ),
+                        Offstage(
+                          offstage: !needToRepeat,
+                          child: Divider(
+                          height: 20,
+                          color: Theme.of(context).colorScheme.background,
+                        )),
+                        Offstage(
+                            offstage: !needToRepeat,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('Repeat every', style: Theme.of(context).textTheme.bodyLarge),
+                                TextButton(
                               child: Text('$weekToRepeat Week(s)'),
                               onPressed: () async {
                                 Picker(
@@ -132,7 +147,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                 ).showModal(this.context);
                               },
                             ),
-                            TextButton(
+                                TextButton(
                               child: Text('$daysToRepeat Day(s)'),
                               onPressed: () async {
                                 Picker(
@@ -151,7 +166,11 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                 ).showModal(this.context);
                               },
                             ),
-                          ],
+                              ],
+                        )),
+                        Divider(
+                          height: 20,
+                          color: Theme.of(context).colorScheme.background,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
