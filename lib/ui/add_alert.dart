@@ -19,7 +19,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
   DateTime date = DateTime.now();
   bool isImportant = false;
   int daysToRepeat = 0;
-  int monthsToRepeat = 0;
+  //int monthsToRepeat = 0; // unused
   int weekToRepeat = 0;
   DateTime nextNotifyDate = DateTime.now();
 
@@ -30,7 +30,8 @@ class _AddAlertPageState extends State<AddAlertPage> {
             title: title,
             description: description,
             setTime: DateTime.now(),
-            expireTime: date);
+            expireTime: date,
+            repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
 
         AlarmDatabase.instance.create(newAlert);
         Navigator.of(context).pop();

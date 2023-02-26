@@ -3,7 +3,8 @@ const String tableAlert = 'tableAlert';
 class AlertFields {
   static final List<String> values = [
     /// Add all fields
-    id, title, isImportant, description, setTime, expireTime
+    id, title, isImportant, description,
+    setTime, expireTime, repeatIntervalTimeInDays
   ];
 
   static const String id = '_id';
@@ -12,6 +13,7 @@ class AlertFields {
   static const String description = 'description';
   static const String setTime = 'setTime';
   static const String expireTime = 'expireTime';
+  static const String repeatIntervalTimeInDays = 'repeatIntervalTimeInDays';
 }
 
 class Alert {
@@ -21,6 +23,7 @@ class Alert {
   final String description;
   final DateTime setTime;
   final DateTime expireTime;
+  final int repeatIntervalTimeInDays;
 
   const Alert(
       {this.id,
@@ -28,7 +31,8 @@ class Alert {
         required this.title,
         required this.description,
         required this.setTime,
-        required this.expireTime});
+        required this.expireTime,
+        required this.repeatIntervalTimeInDays});
 
   Alert copy({
     int? id,
@@ -38,6 +42,7 @@ class Alert {
     String? description,
     DateTime? setTime,
     DateTime? expireTime,
+    int? repeatIntervalTimeInDays
   }) =>
       Alert(
           id: id ?? this.id,
@@ -45,7 +50,8 @@ class Alert {
           title: title ?? this.title,
           description: description ?? this.description,
           setTime: setTime ?? this.setTime,
-          expireTime: expireTime ?? this.expireTime);
+          expireTime: expireTime ?? this.expireTime,
+          repeatIntervalTimeInDays: repeatIntervalTimeInDays ?? this.repeatIntervalTimeInDays);
 
   static Alert fromJson(Map<String, Object?> json) => Alert(
       id: json[AlertFields.id] as int?,
@@ -53,7 +59,8 @@ class Alert {
       title: json[AlertFields.title] as String,
       description: json[AlertFields.description] as String,
       setTime: DateTime.parse(json[AlertFields.setTime] as String),
-      expireTime: DateTime.parse(json[AlertFields.expireTime] as String));
+      expireTime: DateTime.parse(json[AlertFields.expireTime] as String),
+      repeatIntervalTimeInDays: json[AlertFields.repeatIntervalTimeInDays] as int);
 
   Map<String, Object?> toJson() => {
     AlertFields.id: id,
@@ -62,5 +69,6 @@ class Alert {
     AlertFields.description: description,
     AlertFields.setTime: setTime.toIso8601String(),
     AlertFields.expireTime: expireTime.toIso8601String(),
+    AlertFields.repeatIntervalTimeInDays: repeatIntervalTimeInDays
   };
 }
