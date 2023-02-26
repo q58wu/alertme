@@ -18,42 +18,46 @@ class FormDatePicker extends StatefulWidget {
 class FormDatePickerState extends State<FormDatePicker> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
+    return
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Text(
-              'Date',
+              'Notify me on',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            Text(
-              intl.DateFormat.yMd().format(widget.date),
-              style: Theme.of(context).textTheme.titleMedium,
+            const SizedBox(
+              height: 12,
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    intl.DateFormat.yMd().format(widget.date),
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  TextButton(
+                    child: const Text('Pick'),
+                    onPressed: () async {
+                      var newDate = await showDatePicker(
+                        context: context,
+                        initialDate: widget.date,
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2100),
+                      );
+
+                      // Don't change the date if the date picker returns null.
+                      if (newDate == null) {
+                        return;
+                      }
+                      widget.onChanged(newDate);
+                    },
+                  )
+                ]
             ),
           ],
-        ),
-        TextButton(
-          child: const Text('Pick'),
-          onPressed: () async {
-            var newDate = await showDatePicker(
-              context: context,
-              initialDate: widget.date,
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2100),
-            );
-
-            // Don't change the date if the date picker returns null.
-            if (newDate == null) {
-              return;
-            }
-            widget.onChanged(newDate);
-          },
-        )
-      ],
     );
   }
 }

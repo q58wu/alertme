@@ -38,6 +38,9 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   # database storage
   sqflite: ^2.0.0+3
+  flutter_picker:
+    git:
+      url: https://github.com/yangyxd/flutter_picker.git
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -20,6 +20,7 @@ class MainApp extends StatelessWidget {
       title: 'AlertMe',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        /*useMaterial3: true*/
       ),
       home: const MyHomePage(title: 'AlertMe'),
     );
@@ -36,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late List<Alert> allAlert;
+  List<Alert> allAlert = [];
   bool isLoading = false;
 
   @override
