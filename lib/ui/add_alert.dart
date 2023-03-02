@@ -20,7 +20,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
-  DateTime date = DateTime.now().add(Duration(seconds: 10));
+  DateTime date = DateTime.now();
   bool isImportant = false;
   bool needToRepeat = false;
   int daysToRepeat = 0;
@@ -51,10 +51,12 @@ class _AddAlertPageState extends State<AddAlertPage> {
                 repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
 
             AlarmDatabase.instance.create(newAlert);
+
             NotificationService().scheduleNotification(
                 title: newAlert.title,
                 body: newAlert.description,
                 scheduledNotificationDateTime: date);
+
             Navigator.of(context).pop();
           }
         }

@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:alert_me/domain/mapper/TimeUtil.dart';
 
 void main() {
+  NotificationService().initNotification();
   runApp(const MainApp());
 }
 
@@ -45,7 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    NotificationService().initNotification();
     refreshAllAlerts();
   }
 
