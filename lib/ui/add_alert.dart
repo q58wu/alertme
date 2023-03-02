@@ -3,6 +3,10 @@ import 'package:alert_me/domain/model/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:alert_me/ui/form_date_picker.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+import '../usecase/push_notification_service.dart';
 
 class AddAlertPage extends StatefulWidget {
   const AddAlertPage({super.key});
@@ -16,7 +20,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
-  DateTime date = DateTime.now();
+  DateTime date = DateTime.now().add(Duration(seconds: 10));
   bool isImportant = false;
   bool needToRepeat = false;
   int daysToRepeat = 0;
@@ -24,18 +28,36 @@ class _AddAlertPageState extends State<AddAlertPage> {
   int weekToRepeat = 0;
   DateTime nextNotifyDate = DateTime.now();
 
-  Widget saveButton() => IconButton(
+  Widget saveButton(BuildContext context, GlobalKey<FormState> key) => IconButton(
       icon: const Icon(Icons.save),
       onPressed: () async {
-        newAlert = Alert(isImportant: isImportant,
-            title: title,
-            description: description,
-            setTime: DateTime.now(),
-            expireTime: date,
-            repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
+        if(key.currentState!.validate()){
 
-        AlarmDatabase.instance.create(newAlert);
-        Navigator.of(context).pop();
+          if(needToRepeat && weekToRepeat == 0 && daysToRepeat == 0){
+            showTopSnackBar(
+              Overlay.of(context)!,
+              const CustomSnackBar.error(
+                message:
+                "Please make sure repeat interval is greater than 0 day.",
+              ),
+            );
+          }
+          else{
+            newAlert = Alert(isImportant: isImportant,
+                title: title,
+                description: description,
+                setTime: DateTime.now(),
+                expireTime: date,
+                repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
+
+            AlarmDatabase.instance.create(newAlert);
+            NotificationService().scheduleNotification(
+                title: newAlert.title,
+                body: newAlert.description,
+                scheduledNotificationDateTime: date);
+            Navigator.of(context).pop();
+          }
+        }
       }
   );
 
@@ -44,11 +66,9 @@ class _AddAlertPageState extends State<AddAlertPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Alert'),
-        actions: [saveButton()],
+        actions: [saveButton(context, _formKey)],
       ),
-      body: Form(
-        key: _formKey,
-        child: Scrollbar(
+      body: Scrollbar(
           child: Align(
             alignment: Alignment.topCenter,
             child: Card(
@@ -61,17 +81,28 @@ class _AddAlertPageState extends State<AddAlertPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ...[
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            filled: true,
-                            hintText: 'Enter a title...',
-                            labelText: 'Task Title',
+                        Form(
+                        key: _formKey,
+                        autovalidateMode : AutovalidateMode.onUserInteraction,
+                          child:
+                          TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty || value.trim().isEmpty) {
+                                return 'Task title cannot be empty.';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              filled: true,
+                              hintText: 'Enter a title...',
+                              labelText: 'Task Title',
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                title = value;
+                              });
+                            },
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              title = value;
-                            });
-                          },
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -204,7 +235,6 @@ class _AddAlertPageState extends State<AddAlertPage> {
             ),
           ),
         ),
-      ),
     );
   }
 }

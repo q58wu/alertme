@@ -1,6 +1,7 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:alert_me/ui/add_alert.dart';
+import 'package:alert_me/usecase/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,12 +18,13 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'AlertMe',
+      title: 'Alert🕗Me',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        selectedRowColor: Colors.pink.shade200,
         fontFamily: 'Shantell_Sans'
       ),
-      home: const MyHomePage(title: 'AlertMe'),
+      home: const MyHomePage(title: 'Alert🕗Me'),
     );
   }
 }
@@ -43,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    NotificationService().initNotification();
     refreshAllAlerts();
   }
 
@@ -64,13 +67,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Slidable buildSlidable(BuildContext context, int position) {
     Alert currentAlert = allAlert[position];
-    return Slidable(
+    return
+      Slidable(
       actionPane: const SlidableScrollActionPane(),
       secondaryActions: [
         IconSlideAction(
+          caption: 'Delete',
+          color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
+          icon: Icons.delete,
+          onTap: () async {
+            await AlarmDatabase.instance.delete(currentAlert.id!);
+            setState(() { refreshAllAlerts(); });
+          },
+        ),
+        IconSlideAction(
           caption: 'Renew',
-          color: Colors.blue,
-          icon: Icons.access_time_filled,
+          color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
+          icon: Icons.access_time,
           onTap: () {},
         ),
       ],
@@ -91,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey,
           size: 20,
         ),
-        tileColor: Colors.white10,
+        tileColor: currentAlert.isImportant ? Colors.pink.shade300 : Colors.white10,
         dense: false,
       ),
     );
@@ -106,7 +119,17 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
           child: ListView.builder(
         itemBuilder: (context, position) {
-          return buildSlidable(context, position);
+          return
+            Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children:[
+                  buildSlidable(context, position),
+                  Divider(
+                    color: Theme.of(context).colorScheme.background,
+                  )
+                ]
+          );
         },
         itemCount: allAlert.length,
       )),

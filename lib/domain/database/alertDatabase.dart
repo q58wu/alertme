@@ -68,7 +68,7 @@ class AlarmDatabase {
   Future<List<Alert>> readAllAlerts() async {
     final db = await instance.database;
 
-    const orderBy = '${AlertFields.expireTime} ASC';
+    const orderBy = '${AlertFields.isImportant} DESC, ${AlertFields.expireTime} ASC';
 
     final result = await db.query(tableAlert, orderBy: orderBy);
 
