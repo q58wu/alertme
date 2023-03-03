@@ -1,6 +1,7 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:alert_me/ui/add_alert.dart';
+import 'package:alert_me/ui/alert_detail.dart';
 import 'package:alert_me/usecase/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -96,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         subtitle: Text(
-          TimeUtil.convertDatetimeToYMMMED(currentAlert.expireTime),
+          "Next on ${TimeUtil.convertDatetimeToYMMMED(currentAlert.expireTime)}",
           style: Theme.of(context).textTheme.titleMedium,
         ),
         trailing: const Icon(
@@ -115,6 +116,31 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          PopupMenuButton(
+              itemBuilder: (context){
+                return [
+                  const PopupMenuItem<int>(
+                    value: 0,
+                    child: Text("Setting"),
+                  ),
+
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: Text("About"),
+                  ),
+                ];
+              },
+              onSelected:(value){
+                if(value == 0){
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AlertDetailPage()),)
+                          .then((value) => setState(() {refreshAllAlerts();}));
+                }else if(value == 1){
+                  //TODO
+                }
+              }
+          )
+        ],
       ),
       body: Center(
           child: ListView.builder(
