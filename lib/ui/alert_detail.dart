@@ -1,23 +1,23 @@
 import 'package:flutter/cupertino.dart';
-import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:alert_me/ui/form_date_picker.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
-
-import '../usecase/push_notification_service.dart';
-import '../domain/model/alert.dart';
+import 'package:easy_loading_button/easy_loading_button.dart';
 
 class AlertDetailPage extends StatefulWidget{
-  const AlertDetailPage({super.key});
+  final String id;
+
+  const AlertDetailPage(this.id, {super.key});
 
   @override
   State createState() => _AlertDetailPageState();
 }
 
 class _AlertDetailPageState extends State<AlertDetailPage> {
+  final String id;
+  _AlertDetailPageState(this.id);
+
   late Alert newAlert;
   final _formKey = GlobalKey<FormState>();
   String title = '';
@@ -34,6 +34,9 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Alert created on ')
+      ),
       body: Scrollbar(
         child: Align(
           alignment: Alignment.topCenter,
@@ -184,6 +187,34 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                             },
                           ),
                         ],
+                      ),
+                      EasyButton(
+                        idleStateWidget: const Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        loadingStateWidget: const CircularProgressIndicator(
+                          strokeWidth: 3.0,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                        useEqualLoadingStateWidgetDimension: true,
+                        useWidthAnimation: false,
+                        width: 250.0,
+                        height: 40.0,
+                        borderRadius: 4.0,
+                        elevation: 2.0,
+                        contentGap: 6.0,
+                        buttonColor: Theme.of(context).colorScheme.primary,
+                        onPressed: () {
+
+                        },
+                      ),
+                      const SizedBox(
+                        height: 5,
                       ),
                       //Button()
                     ].expand(

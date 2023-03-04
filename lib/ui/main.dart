@@ -89,6 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
       child: ListTile(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AlertDetailPage()),)
+            .then((value) => setState(() {refreshAllAlerts();}));
+          },
         leading: const FaIcon(
           FontAwesomeIcons.airbnb,
         ),
@@ -133,8 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               onSelected:(value){
                 if(value == 0){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AlertDetailPage()),)
-                          .then((value) => setState(() {refreshAllAlerts();}));
+                      //TODO
                 }else if(value == 1){
                   //TODO
                 }
