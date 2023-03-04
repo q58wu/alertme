@@ -90,8 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       child: ListTile(
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AlertDetailPage()),)
-            .then((value) => setState(() {refreshAllAlerts();}));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => AlertDetailPage(currentAlert.id)),)
+              .then((value) => setState(() {refreshAllAlerts();}));
           },
         leading: const FaIcon(
           FontAwesomeIcons.airbnb,

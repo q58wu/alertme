@@ -1,12 +1,15 @@
+import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:alert_me/ui/form_date_picker.dart';
 import 'package:easy_loading_button/easy_loading_button.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class AlertDetailPage extends StatefulWidget{
-  final String id;
+  final int? id;
 
   const AlertDetailPage(this.id, {super.key});
 
@@ -15,10 +18,9 @@ class AlertDetailPage extends StatefulWidget{
 }
 
 class _AlertDetailPageState extends State<AlertDetailPage> {
-  final String id;
-  _AlertDetailPageState(this.id);
-
-  late Alert newAlert;
+  _AlertDetailPageState();
+  late Alert updatedAlert;
+  int _id = 0;
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
@@ -32,10 +34,35 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
 
 
   @override
+  void initState() {
+    super.initState();
+    _id = widget.id ?? -1;
+    initData();
+  }
+
+  Future<void> initData() async {
+    Alert current = await AlarmDatabase.instance.readAlert(_id);
+
+    setState(() {
+      title = current.title;
+      description = current.description;
+      isImportant = current.isImportant;
+      needToRepeat = current.repeatIntervalTimeInDays != 0;
+      daysToRepeat = current.repeatIntervalTimeInDays;
+
+      titleTextController.text = title;
+      descriptionTextController.text = description;
+    });
+  }
+
+  TextEditingController titleTextController = TextEditingController.fromValue(const TextEditingValue(text: ""));
+  TextEditingController descriptionTextController = TextEditingController.fromValue(const TextEditingValue(text: ""));
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alert created on ')
+        title: Text('${date}')
       ),
       body: Scrollbar(
         child: Align(
@@ -61,6 +88,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                             }
                             return null;
                           },
+                          controller: titleTextController,
                           decoration: const InputDecoration(
                             filled: true,
                             hintText: 'Enter a title...',
@@ -80,6 +108,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                           hintText: 'Enter a description...',
                           labelText: 'Task Description',
                         ),
+                        controller: descriptionTextController,
                         onChanged: (value) {
                           description = value;
                         },
@@ -209,8 +238,39 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                         elevation: 2.0,
                         contentGap: 6.0,
                         buttonColor: Theme.of(context).colorScheme.primary,
-                        onPressed: () {
+                        onPressed: () async {
+                          if(_formKey.currentState!.validate()){
 
+                            if(needToRepeat && weekToRepeat == 0 && daysToRepeat == 0){
+                              showTopSnackBar(
+                                Overlay.of(context)!,
+                                const CustomSnackBar.error(
+                                  message:
+                                  "Please make sure repeat interval is greater than 0 day.",
+                                ),
+                              );
+                            }
+                            else{
+                              updatedAlert = Alert(
+                                  id: _id,
+                                  isImportant: isImportant,
+                                  title: title,
+                                  description: description,
+                                  setTime: DateTime.now(),
+                                  expireTime: date,
+                                  repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
+
+                              AlarmDatabase.instance.update(updatedAlert);
+
+                              //TODO cancel previous scheduled notification then create new ones?
+/*                              NotificationService().scheduleNotification(
+                                  title: newAlert.title,
+                                  body: newAlert.description,
+                                  scheduledNotificationDateTime: date);*/
+
+                              Navigator.of(context).pop();
+                            }
+                          }
                         },
                       ),
                       const SizedBox(
