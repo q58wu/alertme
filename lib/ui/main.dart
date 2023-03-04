@@ -23,7 +23,7 @@ class MainApp extends StatelessWidget {
       title: 'Alert🕗Me',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        selectedRowColor: Colors.pink.shade200,
+        selectedRowColor: Colors.pink.shade50,
         fontFamily: 'Shantell_Sans'
       ),
       home: const MyHomePage(title: 'Alert🕗Me'),
@@ -85,7 +85,17 @@ class _MyHomePageState extends State<MyHomePage> {
           caption: 'Renew',
           color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
           icon: Icons.access_time,
-          onTap: () {},
+          onTap: () async {
+            Alert updatedAlert = currentAlert.copy(
+                expireTime: currentAlert.expireTime.add(
+                    Duration(days: currentAlert.repeatIntervalTimeInDays)));
+
+            await AlarmDatabase.instance.update(updatedAlert);
+            setState(() {
+              //TODO:: can possibly just update the updated item here.
+              refreshAllAlerts();
+            });
+          },
         ),
       ],
       child: ListTile(
@@ -110,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey,
           size: 20,
         ),
-        tileColor: currentAlert.isImportant ? Colors.pink.shade300 : Colors.white10,
+        tileColor: currentAlert.isImportant ? Colors.pink.shade50 : Colors.white10,
         dense: false,
       ),
     );
