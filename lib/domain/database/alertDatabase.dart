@@ -37,7 +37,10 @@ class AlarmDatabase {
         ${AlertFields.description} $textType,
         ${AlertFields.setTime} $textType,
         ${AlertFields.expireTime} $textType,
-        ${AlertFields.repeatIntervalTimeInDays} $integerType
+        ${AlertFields.repeatIntervalTimeInDays} $integerType,
+        ${AlertFields.repeatIntervalTimeInHours} $integerType,
+        ${AlertFields.repeatIntervalTimeInMinutes} $integerType,
+        ${AlertFields.repeatIntervalTimeInWeeks} $integerType
   )
 ''');
   }

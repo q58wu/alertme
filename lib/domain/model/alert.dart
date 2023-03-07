@@ -4,7 +4,9 @@ class AlertFields {
   static final List<String> values = [
     /// Add all fields
     id, title, isImportant, description,
-    setTime, expireTime, repeatIntervalTimeInDays
+    setTime, expireTime, repeatIntervalTimeInDays,
+    repeatIntervalTimeInWeeks, repeatIntervalTimeInHours,
+    repeatIntervalTimeInMinutes
   ];
 
   static const String id = '_id';
@@ -14,6 +16,9 @@ class AlertFields {
   static const String setTime = 'setTime';
   static const String expireTime = 'expireTime';
   static const String repeatIntervalTimeInDays = 'repeatIntervalTimeInDays';
+  static const String repeatIntervalTimeInWeeks = 'repeatIntervalTimeInWeeks';
+  static const String repeatIntervalTimeInHours = 'repeatIntervalTimeInHours';
+  static const String repeatIntervalTimeInMinutes = 'repeatIntervalTimeInMinutes';
 }
 
 class Alert {
@@ -24,6 +29,9 @@ class Alert {
   final DateTime setTime;
   final DateTime expireTime;
   final int repeatIntervalTimeInDays;
+  final int repeatIntervalTimeInWeeks;
+  final int repeatIntervalTimeInHours;
+  final int repeatIntervalTimeInMinutes;
 
   const Alert(
       {this.id,
@@ -32,7 +40,10 @@ class Alert {
         required this.description,
         required this.setTime,
         required this.expireTime,
-        required this.repeatIntervalTimeInDays});
+        required this.repeatIntervalTimeInDays,
+        required this.repeatIntervalTimeInWeeks,
+        required this.repeatIntervalTimeInHours,
+        required this.repeatIntervalTimeInMinutes});
 
   Alert copy({
     int? id,
@@ -42,7 +53,10 @@ class Alert {
     String? description,
     DateTime? setTime,
     DateTime? expireTime,
-    int? repeatIntervalTimeInDays
+    int? repeatIntervalTimeInDays,
+    int? repeatIntervalTimeInWeeks,
+    int? repeatIntervalTimeInHours,
+    int? repeatIntervalTimeInMinutes
   }) =>
       Alert(
           id: id ?? this.id,
@@ -51,7 +65,11 @@ class Alert {
           description: description ?? this.description,
           setTime: setTime ?? this.setTime,
           expireTime: expireTime ?? this.expireTime,
-          repeatIntervalTimeInDays: repeatIntervalTimeInDays ?? this.repeatIntervalTimeInDays);
+          repeatIntervalTimeInDays: repeatIntervalTimeInDays ?? this.repeatIntervalTimeInDays,
+          repeatIntervalTimeInWeeks: repeatIntervalTimeInWeeks ?? this.repeatIntervalTimeInWeeks,
+          repeatIntervalTimeInHours: repeatIntervalTimeInHours ?? this.repeatIntervalTimeInHours,
+          repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes ?? this.repeatIntervalTimeInMinutes,
+      );
 
   static Alert fromJson(Map<String, Object?> json) => Alert(
       id: json[AlertFields.id] as int?,
@@ -60,7 +78,10 @@ class Alert {
       description: json[AlertFields.description] as String,
       setTime: DateTime.parse(json[AlertFields.setTime] as String),
       expireTime: DateTime.parse(json[AlertFields.expireTime] as String),
-      repeatIntervalTimeInDays: json[AlertFields.repeatIntervalTimeInDays] as int);
+      repeatIntervalTimeInDays: json[AlertFields.repeatIntervalTimeInDays] as int,
+      repeatIntervalTimeInWeeks: json[AlertFields.repeatIntervalTimeInWeeks] as int,
+      repeatIntervalTimeInHours: json[AlertFields.repeatIntervalTimeInHours] as int,
+      repeatIntervalTimeInMinutes: json[AlertFields.repeatIntervalTimeInMinutes] as int);
 
   Map<String, Object?> toJson() => {
     AlertFields.id: id,
@@ -69,6 +90,9 @@ class Alert {
     AlertFields.description: description,
     AlertFields.setTime: setTime.toIso8601String(),
     AlertFields.expireTime: expireTime.toIso8601String(),
-    AlertFields.repeatIntervalTimeInDays: repeatIntervalTimeInDays
+    AlertFields.repeatIntervalTimeInDays: repeatIntervalTimeInDays,
+    AlertFields.repeatIntervalTimeInWeeks: repeatIntervalTimeInWeeks,
+    AlertFields.repeatIntervalTimeInHours: repeatIntervalTimeInHours,
+    AlertFields.repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes
   };
 }
