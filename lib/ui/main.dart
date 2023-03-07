@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:alert_me/domain/mapper/TimeUtil.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   NotificationService().initNotification();
+  tz.initializeDatabase([]);
   runApp(const MainApp());
 }
 
@@ -77,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
           icon: Icons.delete,
           onTap: () async {
-            await AlarmDatabase.instance.delete(currentAlert.id!);
+            await AlarmDatabase.instance.delete(currentAlert.id!).then((value) => NotificationService().cancelNotification(currentAlert.id!));
             setState(() { refreshAllAlerts(); });
           },
         ),

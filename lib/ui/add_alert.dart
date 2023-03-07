@@ -43,19 +43,18 @@ class _AddAlertPageState extends State<AddAlertPage> {
             );
           }
           else{
-            newAlert = Alert(isImportant: isImportant,
+            AlarmDatabase.instance.create(
+                Alert(isImportant: isImportant,
                 title: title,
                 description: description,
                 setTime: DateTime.now(),
                 expireTime: date,
-                repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat);
-
-            AlarmDatabase.instance.create(newAlert);
-
-            NotificationService().scheduleNotification(
+                repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat)
+            ).then((newAlert) => (newAlert.id != null) ? NotificationService().scheduleNotification(
+                id: newAlert.id!,
                 title: newAlert.title,
                 body: newAlert.description,
-                scheduledNotificationDateTime: date);
+                scheduledNotificationDateTime: date) : Future.error("Insertion Failed"));
 
             Navigator.of(context).pop();
           }

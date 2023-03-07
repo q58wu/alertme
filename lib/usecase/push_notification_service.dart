@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../domain/model/alert.dart';
+
 class NotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
   FlutterLocalNotificationsPlugin();
@@ -55,4 +57,21 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
         UILocalNotificationDateInterpretation.absoluteTime);
   }
+
+  Future scheduleNotificationFromAlert(Alert alert) async {
+    return scheduleNotification(
+        id: alert.id ?? 0,
+        title: alert.title,
+        body: alert.description,
+        scheduledNotificationDateTime: alert.expireTime);
+  }
+
+  Future<void> cancelNotification(int id) async {
+    return notificationsPlugin.cancel(id);
+  }
+
+  Future<List<PendingNotificationRequest>> getAllNotifications() async {
+    return notificationsPlugin.pendingNotificationRequests();
+  }
+
 }
