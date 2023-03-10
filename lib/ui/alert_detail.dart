@@ -51,7 +51,10 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
       title = current.title;
       description = current.description;
       isImportant = current.isImportant;
-      needToRepeat = current.repeatIntervalTimeInDays != 0;
+      needToRepeat = current.repeatIntervalTimeInDays != 0 ||
+          current.repeatIntervalTimeInWeeks != 0 ||
+          current.repeatIntervalTimeInMinutes != 0 ||
+          current.repeatIntervalTimeInHours != 0;
       daysToRepeat = current.repeatIntervalTimeInDays;
       weekToRepeat = current.repeatIntervalTimeInWeeks;
       hoursToRepeat = current.repeatIntervalTimeInHours;
