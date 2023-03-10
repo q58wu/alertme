@@ -182,7 +182,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                   onPressed: () async {
                                     Picker(
                                         adapter: PickerDataAdapter<int>(
-                                            pickerData: [1,2,3,4,5,6,7,8,9,10,11,12]
+                                            pickerData: [0,1,2,3,4,5,6,7,8,9,10,11,12]
                                         ),
                                         changeToFirst: true,
                                         hideHeader: false,
@@ -199,7 +199,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                   onPressed: () async {
                                     Picker(
                                         adapter: PickerDataAdapter<int>(
-                                            pickerData: [1,2,3,4,5,6,7,8,9,10,11,
+                                            pickerData: [0,1,2,3,4,5,6,7,8,9,10,11,
                                               12,13,14,15,16,17,18,19,20,21,22,
                                               23,24,25,26,27,28,29,30,31]
                                         ),
@@ -226,7 +226,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                   onPressed: () async {
                                     Picker(
                                         adapter: PickerDataAdapter<int>(
-                                            pickerData: [1,2,3,4,5,6,7,8,9,10,11,
+                                            pickerData: [0,1,2,3,4,5,6,7,8,9,10,11,
                                               12,13,14,15,16,17,18,19,20,21,22,
                                               23,24]
                                         ),
@@ -241,11 +241,11 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                   },
                                 ),
                                 TextButton(
-                                  child: Text('$daysToRepeat Minute(s)'),
+                                  child: Text('$minutesToRepeat Minute(s)'),
                                   onPressed: () async {
                                     Picker(
                                         adapter: PickerDataAdapter<int>(
-                                            pickerData: [1,2,3,4,5,6,7,8,9,10,11,
+                                            pickerData: [0,1,2,3,4,5,6,7,8,9,10,11,
                                               12,13,14,15,16,17,18,19,20,21,22,
                                               23,24,25,26,27,28,29,30,31,32,33,34,
                                               35,36,37,38,39,40,41,42,43,44,45,46,
@@ -255,7 +255,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                                         hideHeader: false,
                                         onConfirm: (Picker picker, List value) {
                                           setState(() {
-                                            daysToRepeat = picker.getSelectedValues()[0];
+                                            minutesToRepeat = picker.getSelectedValues()[0];
                                           });
                                         }
                                     ).showModal(this.context);
