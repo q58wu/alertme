@@ -46,8 +46,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
             );
           }
           else{
-            AlarmDatabase.instance.create(
-                Alert(isImportant: isImportant,
+            newAlert = Alert(isImportant: isImportant,
                 title: title,
                 description: description,
                 setTime: DateTime.now(),
@@ -55,7 +54,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
                 repeatIntervalTimeInDays: daysToRepeat,
                 repeatIntervalTimeInHours: hoursToRepeat,
                 repeatIntervalTimeInMinutes: minutesToRepeat,
-                repeatIntervalTimeInWeeks: weekToRepeat));
+                repeatIntervalTimeInWeeks: weekToRepeat);
 
                 AlarmDatabase.instance.create(newAlert).then((newAlert) =>
                     (newAlert.id != null)
