@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:alert_me/domain/model/alert.dart';
@@ -7,6 +9,7 @@ import 'package:alert_me/ui/form_date_picker.dart';
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import '../usecase/push_notification_service.dart';
 
 class AlertDetailPage extends StatefulWidget{
   final int? id;
@@ -324,13 +327,10 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                   repeatIntervalTimeInMinutes: minutesToRepeat,
                                   repeatIntervalTimeInWeeks: weekToRepeat);
 
-                              AlarmDatabase.instance.update(updatedAlert);
-
-                              //TODO cancel previous scheduled notification then create new ones?
-/*                              NotificationService().scheduleNotification(
-                                  title: newAlert.title,
-                                  body: newAlert.description,
-                                  scheduledNotificationDateTime: date);*/
+                              AlarmDatabase.instance
+                                  .update(updatedAlert)
+                                  .then((value) => (value > 0) ? NotificationService().cancelNotification(_id) : Future.error("Update Failed"))
+                                  .then((value) => NotificationService().scheduleNotificationFromAlert(updatedAlert));
 
                               Navigator.of(context).pop();
                             }
