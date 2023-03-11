@@ -279,7 +279,9 @@ class _AddAlertPageState extends State<AddAlertPage> {
                       ].expand(
                             (widget) => [
                           widget,
-                          const SizedBox(
+                              (widget.runtimeType == Offstage && (widget as Offstage).offstage)
+                              ? const SizedBox.shrink()
+                              : const SizedBox(
                             height: 24,
                           )
                         ],
