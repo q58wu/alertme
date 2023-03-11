@@ -9,7 +9,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../usecase/push_notification_service.dart';
 
-class AlertDetailPage extends StatefulWidget{
+class AlertDetailPage extends StatefulWidget {
   final int? id;
 
   const AlertDetailPage(this.id, {super.key});
@@ -20,6 +20,7 @@ class AlertDetailPage extends StatefulWidget{
 
 class _AlertDetailPageState extends State<AlertDetailPage> {
   _AlertDetailPageState();
+
   late Alert updatedAlert;
   int _id = 0;
   final _formKey = GlobalKey<FormState>();
@@ -33,7 +34,6 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   int hoursToRepeat = 0;
   DateTime nextNotifyDate = DateTime.now();
   TimeOfDay nextNotifyTime = TimeOfDay.now();
-
 
   @override
   void initState() {
@@ -58,21 +58,22 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
       hoursToRepeat = current.repeatIntervalTimeInHours;
       minutesToRepeat = current.repeatIntervalTimeInMinutes;
       nextNotifyDate = current.expireTime;
-      nextNotifyTime = TimeOfDay(hour: nextNotifyDate.hour, minute: nextNotifyDate.minute);
+      nextNotifyTime =
+          TimeOfDay(hour: nextNotifyDate.hour, minute: nextNotifyDate.minute);
       titleTextController.text = title;
       descriptionTextController.text = description;
     });
   }
 
-  TextEditingController titleTextController = TextEditingController.fromValue(const TextEditingValue(text: ""));
-  TextEditingController descriptionTextController = TextEditingController.fromValue(const TextEditingValue(text: ""));
+  TextEditingController titleTextController =
+      TextEditingController.fromValue(const TextEditingValue(text: ""));
+  TextEditingController descriptionTextController =
+      TextEditingController.fromValue(const TextEditingValue(text: ""));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Alert')
-      ),
+      appBar: AppBar(title: const Text('Edit Alert')),
       body: Scrollbar(
         child: Align(
           alignment: Alignment.topCenter,
@@ -88,11 +89,12 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                     ...[
                       Form(
                         key: _formKey,
-                        autovalidateMode : AutovalidateMode.onUserInteraction,
-                        child:
-                        TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        child: TextFormField(
                           validator: (value) {
-                            if (value == null || value.isEmpty || value.trim().isEmpty) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value.trim().isEmpty) {
                               return 'Task title cannot be empty.';
                             }
                             return null;
@@ -175,7 +177,8 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text('Repeat every', style: Theme.of(context).textTheme.bodyLarge),
+                              Text('Repeat every',
+                                  style: Theme.of(context).textTheme.bodyLarge),
                             ],
                           )),
                       Offstage(
@@ -189,16 +192,16 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                 onPressed: () async {
                                   Picker(
                                       adapter: PickerDataAdapter<int>(
-                                          pickerData: Iterable<int>.generate(13).toList()
-                                      ),
+                                          pickerData: Iterable<int>.generate(13)
+                                              .toList()),
                                       changeToFirst: true,
                                       hideHeader: false,
                                       onConfirm: (Picker picker, List value) {
                                         setState(() {
-                                          weekToRepeat = picker.getSelectedValues()[0];
+                                          weekToRepeat =
+                                              picker.getSelectedValues()[0];
                                         });
-                                      }
-                                  ).showModal(this.context);
+                                      }).showModal(this.context);
                                 },
                               ),
                               TextButton(
@@ -206,16 +209,16 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                 onPressed: () async {
                                   Picker(
                                       adapter: PickerDataAdapter<int>(
-                                          pickerData: Iterable<int>.generate(32).toList()
-                                      ),
+                                          pickerData: Iterable<int>.generate(32)
+                                              .toList()),
                                       changeToFirst: true,
                                       hideHeader: false,
                                       onConfirm: (Picker picker, List value) {
                                         setState(() {
-                                          daysToRepeat = picker.getSelectedValues()[0];
+                                          daysToRepeat =
+                                              picker.getSelectedValues()[0];
                                         });
-                                      }
-                                  ).showModal(this.context);
+                                      }).showModal(this.context);
                                 },
                               )
                             ],
@@ -231,16 +234,16 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                 onPressed: () async {
                                   Picker(
                                       adapter: PickerDataAdapter<int>(
-                                          pickerData: Iterable<int>.generate(25).toList()
-                                      ),
+                                          pickerData: Iterable<int>.generate(25)
+                                              .toList()),
                                       changeToFirst: true,
                                       hideHeader: false,
                                       onConfirm: (Picker picker, List value) {
                                         setState(() {
-                                          hoursToRepeat = picker.getSelectedValues()[0];
+                                          hoursToRepeat =
+                                              picker.getSelectedValues()[0];
                                         });
-                                      }
-                                  ).showModal(this.context);
+                                      }).showModal(this.context);
                                 },
                               ),
                               TextButton(
@@ -248,16 +251,16 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                 onPressed: () async {
                                   Picker(
                                       adapter: PickerDataAdapter<int>(
-                                          pickerData: Iterable<int>.generate(61).toList()
-                                      ),
+                                          pickerData: Iterable<int>.generate(61)
+                                              .toList()),
                                       changeToFirst: true,
                                       hideHeader: false,
                                       onConfirm: (Picker picker, List value) {
                                         setState(() {
-                                          minutesToRepeat = picker.getSelectedValues()[0];
+                                          minutesToRepeat =
+                                              picker.getSelectedValues()[0];
                                         });
-                                      }
-                                  ).showModal(this.context);
+                                      }).showModal(this.context);
                                 },
                               ),
                             ],
@@ -304,22 +307,26 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                         contentGap: 6.0,
                         buttonColor: Theme.of(context).colorScheme.primary,
                         onPressed: () async {
-                          if(_formKey.currentState!.validate()){
-
-                            if(needToRepeat && weekToRepeat == 0 &&
-                                daysToRepeat == 0 && hoursToRepeat == 0 &&
-                                minutesToRepeat == 0){
+                          if (_formKey.currentState!.validate()) {
+                            if (needToRepeat &&
+                                weekToRepeat == 0 &&
+                                daysToRepeat == 0 &&
+                                hoursToRepeat == 0 &&
+                                minutesToRepeat == 0) {
                               showTopSnackBar(
                                 Overlay.of(context)!,
                                 const CustomSnackBar.error(
                                   message:
-                                  "Please make sure repeat interval is greater than 0 minutes.",
+                                      "Please make sure repeat interval is greater than 0 minutes.",
                                 ),
                               );
-                            }
-                            else{
-                              nextNotifyDate = DateTime(nextNotifyDate.year, nextNotifyDate.month,
-                                  nextNotifyDate.day, nextNotifyTime.hour, nextNotifyTime.minute);
+                            } else {
+                              nextNotifyDate = DateTime(
+                                  nextNotifyDate.year,
+                                  nextNotifyDate.month,
+                                  nextNotifyDate.day,
+                                  nextNotifyTime.hour,
+                                  nextNotifyTime.minute);
 
                               updatedAlert = Alert(
                                   id: _id,
@@ -328,15 +335,27 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                   description: description,
                                   setTime: DateTime.now(),
                                   expireTime: nextNotifyDate,
-                                  repeatIntervalTimeInDays: !needToRepeat ? 0 : daysToRepeat,
-                                  repeatIntervalTimeInHours: !needToRepeat ? 0 : hoursToRepeat,
-                                  repeatIntervalTimeInMinutes: !needToRepeat ? 0 : minutesToRepeat,
-                                  repeatIntervalTimeInWeeks: !needToRepeat ? 0 : weekToRepeat);
+                                  repeatIntervalTimeInDays:
+                                      !needToRepeat ? 0 : daysToRepeat,
+                                  repeatIntervalTimeInHours:
+                                      !needToRepeat ? 0 : hoursToRepeat,
+                                  repeatIntervalTimeInMinutes:
+                                      !needToRepeat ? 0 : minutesToRepeat,
+                                  repeatIntervalTimeInWeeks:
+                                      !needToRepeat ? 0 : weekToRepeat);
 
                               AlarmDatabase.instance
                                   .update(updatedAlert)
-                                  .then((value) => (value > 0) ? NotificationService().cancelNotification(_id) : Future.error("Update Failed"))
-                                  .then((value) => needToRepeat ? NotificationService().scheduleNotificationFromAlert(updatedAlert) : Future.error("no more notification needed"));
+                                  .then((value) => (value > 0)
+                                      ? NotificationService()
+                                          .cancelNotification(_id)
+                                      : Future.error("Update Failed"))
+                                  .then((value) => needToRepeat
+                                      ? NotificationService()
+                                          .scheduleNotificationFromAlert(
+                                              updatedAlert)
+                                      : Future.error(
+                                          "no more notification needed"));
 
                               Navigator.of(context).pop();
                             }
@@ -348,12 +367,15 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                       ),
                       //Button()
                     ].expand(
-                          (widget) => [
-                        widget,
-                        const SizedBox(
-                          height: 24,
-                        )
-                      ],
+                      (widget) => (widget.runtimeType == Offstage &&
+                              (widget as Offstage).offstage)
+                          ? [widget]
+                          : [
+                              widget,
+                              const SizedBox(
+                                height: 24,
+                              )
+                            ],
                     )
                   ],
                 ),
@@ -364,5 +386,4 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
       ),
     );
   }
-
 }
