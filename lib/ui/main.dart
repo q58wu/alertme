@@ -89,8 +89,12 @@ class _MyHomePageState extends State<MyHomePage> {
           icon: Icons.access_time,
           onTap: () async {
             Alert updatedAlert = currentAlert.copy(
-                expireTime: currentAlert.expireTime.add(
-                    Duration(days: currentAlert.repeatIntervalTimeInDays)));
+                expireTime: currentAlert.expireTime.add(Duration(
+              days: currentAlert.repeatIntervalTimeInDays +
+                  currentAlert.repeatIntervalTimeInWeeks * 7,
+              minutes: currentAlert.repeatIntervalTimeInMinutes,
+              hours: currentAlert.repeatIntervalTimeInHours,
+            )));
 
             await AlarmDatabase.instance.update(updatedAlert);
             setState(() {

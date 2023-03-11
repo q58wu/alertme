@@ -24,8 +24,9 @@ class _AddAlertPageState extends State<AddAlertPage> {
   bool isImportant = false;
   bool needToRepeat = false;
   int daysToRepeat = 0;
-  //int monthsToRepeat = 0; // unused
   int weekToRepeat = 0;
+  int minutesToRepeat = 0;
+  int hoursToRepeat = 0;
   DateTime nextNotifyDate = DateTime.now();
 
   Widget saveButton(BuildContext context, GlobalKey<FormState> key) => IconButton(
@@ -33,30 +34,36 @@ class _AddAlertPageState extends State<AddAlertPage> {
       onPressed: () async {
         if(key.currentState!.validate()){
 
-          if(needToRepeat && weekToRepeat == 0 && daysToRepeat == 0){
+          if(needToRepeat && weekToRepeat == 0 &&
+              daysToRepeat == 0 && hoursToRepeat == 0 &&
+              minutesToRepeat == 0){
             showTopSnackBar(
               Overlay.of(context)!,
               const CustomSnackBar.error(
                 message:
-                "Please make sure repeat interval is greater than 0 day.",
+                "Please make sure repeat interval is greater than 0 minutes.",
               ),
             );
           }
           else{
-            AlarmDatabase.instance.create(
-                Alert(isImportant: isImportant,
+            newAlert = Alert(isImportant: isImportant,
                 title: title,
                 description: description,
                 setTime: DateTime.now(),
                 expireTime: date,
-                repeatIntervalTimeInDays: weekToRepeat * 7 + daysToRepeat)
-            ).then((newAlert) => (newAlert.id != null) ? NotificationService().scheduleNotification(
-                id: newAlert.id!,
-                title: newAlert.title,
-                body: newAlert.description,
-                scheduledNotificationDateTime: date) : Future.error("Insertion Failed"));
+                repeatIntervalTimeInDays: daysToRepeat,
+                repeatIntervalTimeInHours: hoursToRepeat,
+                repeatIntervalTimeInMinutes: minutesToRepeat,
+                repeatIntervalTimeInWeeks: weekToRepeat);
 
-            Navigator.of(context).pop();
+                AlarmDatabase.instance.create(newAlert).then((newAlert) =>
+                    (newAlert.id != null)
+                        ? NotificationService().scheduleNotification(
+                            id: newAlert.id!,
+                            scheduledNotificationDateTime: date)
+                        : Future.error("Insertion Failed"));
+
+                Navigator.of(context).pop();
           }
         }
       }
@@ -162,44 +169,92 @@ class _AddAlertPageState extends State<AddAlertPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text('Repeat every', style: Theme.of(context).textTheme.bodyLarge),
-                                TextButton(
-                              child: Text('$weekToRepeat Week(s)'),
-                              onPressed: () async {
-                                Picker(
-                                    adapter: PickerDataAdapter<int>(
-                                        pickerData: [1,2,3,4,5,6,7,8,9,10,11,12]
-                                    ),
-                                    changeToFirst: true,
-                                    hideHeader: false,
-                                    onConfirm: (Picker picker, List value) {
-                                      setState(() {
-                                        weekToRepeat = picker.getSelectedValues()[0];
-                                      });
-                                    }
-                                ).showModal(this.context);
-                              },
-                            ),
-                                TextButton(
-                              child: Text('$daysToRepeat Day(s)'),
-                              onPressed: () async {
-                                Picker(
-                                    adapter: PickerDataAdapter<int>(
-                                        pickerData: [1,2,3,4,5,6,7,8,9,10,11,
-                                          12,13,14,15,16,17,18,19,20,21,22,
-                                          23,24,25,26,27,28,29,30,31]
-                                    ),
-                                    changeToFirst: true,
-                                    hideHeader: false,
-                                    onConfirm: (Picker picker, List value) {
-                                      setState(() {
-                                        daysToRepeat = picker.getSelectedValues()[0];
-                                      });
-                                    }
-                                ).showModal(this.context);
-                              },
-                            ),
                               ],
                         )),
+                        Offstage(
+                            offstage: !needToRepeat,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  child: Text('$weekToRepeat Week(s)'),
+                                  onPressed: () async {
+                                    Picker(
+                                        adapter: PickerDataAdapter<int>(
+                                            pickerData: Iterable<int>.generate(13).toList()
+                                        ),
+                                        changeToFirst: true,
+                                        hideHeader: false,
+                                        onConfirm: (Picker picker, List value) {
+                                          setState(() {
+                                            weekToRepeat = picker.getSelectedValues()[0];
+                                          });
+                                        }
+                                    ).showModal(this.context);
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('$daysToRepeat Day(s)'),
+                                  onPressed: () async {
+                                    Picker(
+                                        adapter: PickerDataAdapter<int>(
+                                            pickerData: Iterable<int>.generate(32).toList()
+                                        ),
+                                        changeToFirst: true,
+                                        hideHeader: false,
+                                        onConfirm: (Picker picker, List value) {
+                                          setState(() {
+                                            daysToRepeat = picker.getSelectedValues()[0];
+                                          });
+                                        }
+                                    ).showModal(this.context);
+                                  },
+                                )
+                              ],
+                            )),
+                        Offstage(
+                            offstage: !needToRepeat,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  child: Text('$hoursToRepeat Hour(s)'),
+                                  onPressed: () async {
+                                    Picker(
+                                        adapter: PickerDataAdapter<int>(
+                                            pickerData: Iterable<int>.generate(25).toList()
+                                        ),
+                                        changeToFirst: true,
+                                        hideHeader: false,
+                                        onConfirm: (Picker picker, List value) {
+                                          setState(() {
+                                            hoursToRepeat = picker.getSelectedValues()[0];
+                                          });
+                                        }
+                                    ).showModal(this.context);
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('$minutesToRepeat Minute(s)'),
+                                  onPressed: () async {
+                                    Picker(
+                                        adapter: PickerDataAdapter<int>(
+                                            pickerData: Iterable<int>.generate(61).toList()
+                                        ),
+                                        changeToFirst: true,
+                                        hideHeader: false,
+                                        onConfirm: (Picker picker, List value) {
+                                          setState(() {
+                                            minutesToRepeat = picker.getSelectedValues()[0];
+                                          });
+                                        }
+                                    ).showModal(this.context);
+                                  },
+                                ),
+                              ],
+                            )),
                         Divider(
                           height: 20,
                           color: Theme.of(context).colorScheme.background,
