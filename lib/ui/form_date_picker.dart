@@ -2,20 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
-class FormDatePicker extends StatefulWidget {
-  final DateTime date;
-  final ValueChanged<DateTime> onChanged;
+class FormDateAndTimePicker extends StatefulWidget {
+  final DateTime date; // MM/DD/YYYY
+  final TimeOfDay time; // HH/MM
+  final ValueChanged<DateTime> dateOnChanged;
+  final ValueChanged<TimeOfDay> timeOnChanged;
 
-  const FormDatePicker({
+  const FormDateAndTimePicker({
     required this.date,
-    required this.onChanged,
+    required this.time,
+    required this.dateOnChanged,
+    required this.timeOnChanged
   });
 
   @override
-  State<FormDatePicker> createState() => FormDatePickerState();
+  State<FormDateAndTimePicker> createState() => FormDateAndTimePickerState();
 }
 
-class FormDatePickerState extends State<FormDatePicker> {
+class FormDateAndTimePickerState extends State<FormDateAndTimePicker> {
   @override
   Widget build(BuildContext context) {
     return
@@ -52,7 +56,32 @@ class FormDatePickerState extends State<FormDatePicker> {
                       if (newDate == null) {
                         return;
                       }
-                      widget.onChanged(newDate);
+                      widget.dateOnChanged(newDate);
+                    },
+                  )
+                ]
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "${widget.time.hour}:${widget.time.minute}",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  TextButton(
+                    child: const Text('Pick'),
+                    onPressed: () async {
+                      var newTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+
+                      // Don't change the date if the date picker returns null.
+                      if (newTime == null) {
+                        return;
+                      }
+                      widget.timeOnChanged(newTime);
                     },
                   )
                 ]

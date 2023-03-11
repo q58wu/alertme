@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:alert_me/domain/model/alert.dart';
@@ -27,7 +25,6 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
-  DateTime date = DateTime.now();
   bool isImportant = false;
   bool needToRepeat = false;
   int daysToRepeat = 0;
@@ -35,6 +32,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   int minutesToRepeat = 0;
   int hoursToRepeat = 0;
   DateTime nextNotifyDate = DateTime.now();
+  TimeOfDay nextNotifyTime = TimeOfDay.now();
 
 
   @override
@@ -59,6 +57,8 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
       weekToRepeat = current.repeatIntervalTimeInWeeks;
       hoursToRepeat = current.repeatIntervalTimeInHours;
       minutesToRepeat = current.repeatIntervalTimeInMinutes;
+      nextNotifyDate = current.expireTime;
+      nextNotifyTime = TimeOfDay(hour: nextNotifyDate.hour, minute: nextNotifyDate.minute);
       titleTextController.text = title;
       descriptionTextController.text = description;
     });
@@ -71,7 +71,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${date}')
+        title: const Text('Edit Alert')
       ),
       body: Scrollbar(
         child: Align(
@@ -127,11 +127,19 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                         height: 20,
                         color: Theme.of(context).colorScheme.background,
                       ),
-                      FormDatePicker(
-                        date: date,
-                        onChanged: (value) {
+                      FormDateAndTimePicker(
+                        date: nextNotifyDate,
+                        time: TimeOfDay(
+                            hour: nextNotifyTime.hour,
+                            minute: nextNotifyTime.minute),
+                        dateOnChanged: (value) {
                           setState(() {
-                            date = value;
+                            nextNotifyDate = value;
+                          });
+                        },
+                        timeOnChanged: (value) {
+                          setState(() {
+                            nextNotifyTime = value;
                           });
                         },
                       ),
@@ -310,22 +318,25 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                               );
                             }
                             else{
+                              nextNotifyDate = DateTime(nextNotifyDate.year, nextNotifyDate.month,
+                                  nextNotifyDate.day, nextNotifyTime.hour, nextNotifyTime.minute);
+
                               updatedAlert = Alert(
                                   id: _id,
                                   isImportant: isImportant,
                                   title: title,
                                   description: description,
                                   setTime: DateTime.now(),
-                                  expireTime: date,
-                                  repeatIntervalTimeInDays: daysToRepeat,
-                                  repeatIntervalTimeInHours: hoursToRepeat,
-                                  repeatIntervalTimeInMinutes: minutesToRepeat,
-                                  repeatIntervalTimeInWeeks: weekToRepeat);
+                                  expireTime: nextNotifyDate,
+                                  repeatIntervalTimeInDays: !needToRepeat ? 0 : daysToRepeat,
+                                  repeatIntervalTimeInHours: !needToRepeat ? 0 : hoursToRepeat,
+                                  repeatIntervalTimeInMinutes: !needToRepeat ? 0 : minutesToRepeat,
+                                  repeatIntervalTimeInWeeks: !needToRepeat ? 0 : weekToRepeat);
 
                               AlarmDatabase.instance
                                   .update(updatedAlert)
                                   .then((value) => (value > 0) ? NotificationService().cancelNotification(_id) : Future.error("Update Failed"))
-                                  .then((value) => NotificationService().scheduleNotificationFromAlert(updatedAlert));
+                                  .then((value) => needToRepeat ? NotificationService().scheduleNotificationFromAlert(updatedAlert) : Future.error("no more notification needed"));
 
                               Navigator.of(context).pop();
                             }
