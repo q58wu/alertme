@@ -25,7 +25,6 @@ class MainApp extends StatelessWidget {
       title: 'Alert🕗Me',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        selectedRowColor: Colors.pink.shade50,
         fontFamily: 'Shantell_Sans'
       ),
       home: const MyHomePage(title: 'Alert🕗Me'),
@@ -78,9 +77,12 @@ class _MyHomePageState extends State<MyHomePage> {
           caption: 'Delete',
           color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
           icon: Icons.delete,
-          onTap: () async {
-            await AlarmDatabase.instance.delete(currentAlert.id!).then((value) => NotificationService().cancelNotification(currentAlert.id!));
-            setState(() { refreshAllAlerts(); });
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return buildDeleteAlertDialog(currentAlert);
+                });
           },
         ),
         IconSlideAction(
@@ -129,6 +131,42 @@ class _MyHomePageState extends State<MyHomePage> {
         tileColor: currentAlert.isImportant ? Colors.pink.shade50 : Colors.white10,
         dense: false,
       ),
+    );
+  }
+
+  AlertDialog buildDeleteAlertDialog(Alert currentAlert) {
+    return AlertDialog(
+      title: const Text("Delete Alert"),
+      titleTextStyle: const TextStyle(
+          fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),
+      actionsOverflowButtonSpacing: 20,
+      actions: [
+        ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: const ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
+            ),
+            child: const Text("Cancel")),
+        ElevatedButton(
+          onPressed: () async {
+            await AlarmDatabase.instance.delete(currentAlert.id!).then(
+                (value) =>
+                    NotificationService().cancelNotification(currentAlert.id!));
+            setState(() {
+              refreshAllAlerts();
+            });
+            if (!mounted) return;
+            Navigator.of(context).pop();
+          },
+          style: const ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll<Color>(Colors.red),
+          ),
+          child: const Text("Delete"),
+        )
+      ],
+      content: const Text("Are you sure to delete the alert?"),
     );
   }
 
