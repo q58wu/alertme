@@ -29,36 +29,44 @@ class _AddAlertPageState extends State<AddAlertPage> {
   int minutesToRepeat = 0;
   int hoursToRepeat = 0;
 
+  Widget saveButton(BuildContext context, GlobalKey<FormState> key) =>
+      IconButton(
+          icon: const Icon(Icons.save),
+          onPressed: () async {
+            if (key.currentState!.validate()) {
+              if (needToRepeat &&
+                  weekToRepeat == 0 &&
+                  daysToRepeat == 0 &&
+                  hoursToRepeat == 0 &&
+                  minutesToRepeat == 0) {
+                showTopSnackBar(
+                  Overlay.of(context)!,
+                  const CustomSnackBar.error(
+                    message:
+                        "Please make sure repeat interval is greater than 0 minutes.",
+                  ),
+                );
+              } else {
+                var newNextNotifyDate = DateTime(
+                    nextNotifyDate.year,
+                    nextNotifyDate.month,
+                    nextNotifyDate.day,
+                    nextNotifyTime.hour,
+                    nextNotifyTime.minute);
 
-  Widget saveButton(BuildContext context, GlobalKey<FormState> key) => IconButton(
-      icon: const Icon(Icons.save),
-      onPressed: () async {
-        if(key.currentState!.validate()){
-
-          if(needToRepeat && weekToRepeat == 0 &&
-              daysToRepeat == 0 && hoursToRepeat == 0 &&
-              minutesToRepeat == 0){
-            showTopSnackBar(
-              Overlay.of(context)!,
-              const CustomSnackBar.error(
-                message:
-                "Please make sure repeat interval is greater than 0 minutes.",
-              ),
-            );
-          }
-          else{
-            var newNextNotifyDate = DateTime(nextNotifyDate.year, nextNotifyDate.month,
-                nextNotifyDate.day, nextNotifyTime.hour, nextNotifyTime.minute);
-
-            newAlert = Alert(isImportant: isImportant,
-                title: title,
-                description: description,
-                setTime: DateTime.now(),
-                expireTime: newNextNotifyDate,
-                repeatIntervalTimeInDays: !needToRepeat ? 0 : daysToRepeat,
-                repeatIntervalTimeInHours: !needToRepeat ? 0 : hoursToRepeat,
-                repeatIntervalTimeInMinutes: !needToRepeat ? 0 : minutesToRepeat,
-                repeatIntervalTimeInWeeks: !needToRepeat ? 0 : weekToRepeat);
+                newAlert = Alert(
+                    isImportant: isImportant,
+                    title: title,
+                    description: description,
+                    setTime: DateTime.now(),
+                    expireTime: newNextNotifyDate,
+                    repeatIntervalTimeInDays: !needToRepeat ? 0 : daysToRepeat,
+                    repeatIntervalTimeInHours:
+                        !needToRepeat ? 0 : hoursToRepeat,
+                    repeatIntervalTimeInMinutes:
+                        !needToRepeat ? 0 : minutesToRepeat,
+                    repeatIntervalTimeInWeeks:
+                        !needToRepeat ? 0 : weekToRepeat);
 
                 AlarmDatabase.instance.create(newAlert).then((newAlert) =>
                     (newAlert.id != null)
@@ -68,10 +76,9 @@ class _AddAlertPageState extends State<AddAlertPage> {
                         : Future.error("Insertion Failed"));
 
                 Navigator.of(context).pop();
-          }
-        }
-      }
-  );
+              }
+            }
+          });
 
   @override
   Widget build(BuildContext context) {
@@ -81,58 +88,59 @@ class _AddAlertPageState extends State<AddAlertPage> {
         actions: [saveButton(context, _formKey)],
       ),
       body: Scrollbar(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Card(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ...[
-                        Form(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Card(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ...[
+                      Form(
                         key: _formKey,
-                        autovalidateMode : AutovalidateMode.onUserInteraction,
-                          child:
-                          TextFormField(
-                            validator: (value) {
-                              if (value == null || value.isEmpty || value.trim().isEmpty) {
-                                return 'Task title cannot be empty.';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              filled: true,
-                              hintText: 'Enter a title...',
-                              labelText: 'Task Title',
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                title = value;
-                              });
-                            },
-                          ),
-                        ),
-                        TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value.trim().isEmpty) {
+                              return 'Task title cannot be empty.';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
                             filled: true,
-                            hintText: 'Enter a description...',
-                            labelText: 'Task Description',
+                            hintText: 'Enter a title...',
+                            labelText: 'Task Title',
                           ),
                           onChanged: (value) {
-                            description = value;
+                            setState(() {
+                              title = value;
+                            });
                           },
-                          maxLines: 5,
                         ),
-                        Divider(
-                          height: 20,
-                          color: Theme.of(context).colorScheme.background,
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          hintText: 'Enter a description...',
+                          labelText: 'Task Description',
                         ),
-                        FormDateAndTimePicker(
+                        onChanged: (value) {
+                          description = value;
+                        },
+                        maxLines: 5,
+                      ),
+                      Divider(
+                        height: 20,
+                        color: Theme.of(context).colorScheme.background,
+                      ),
+                      FormDateAndTimePicker(
                           date: nextNotifyDate,
                           time: nextNotifyTime,
                           dateOnChanged: (value) {
@@ -145,161 +153,165 @@ class _AddAlertPageState extends State<AddAlertPage> {
                               nextNotifyTime = value;
                             });
                           }),
-                        Divider(
-                          height: 20,
-                          color: Theme.of(context).colorScheme.background,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Repeat?',
-                                style: Theme.of(context).textTheme.bodyLarge),
-                            Switch(
-                              value: needToRepeat,
-                              onChanged: (enabled) {
-                                setState(() {
-                                  needToRepeat = enabled;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        Offstage(
+                      Divider(
+                        height: 20,
+                        color: Theme.of(context).colorScheme.background,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('Repeat?',
+                              style: Theme.of(context).textTheme.bodyLarge),
+                          Switch(
+                            value: needToRepeat,
+                            onChanged: (enabled) {
+                              setState(() {
+                                needToRepeat = enabled;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Offstage(
                           offstage: !needToRepeat,
                           child: Divider(
-                          height: 20,
-                          color: Theme.of(context).colorScheme.background,
-                        )),
-                        Offstage(
-                            offstage: !needToRepeat,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('Repeat every', style: Theme.of(context).textTheme.bodyLarge),
-                              ],
-                        )),
-                        Offstage(
-                            offstage: !needToRepeat,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                TextButton(
-                                  child: Text('$weekToRepeat Week(s)'),
-                                  onPressed: () async {
-                                    Picker(
-                                        adapter: PickerDataAdapter<int>(
-                                            pickerData: Iterable<int>.generate(13).toList()
-                                        ),
-                                        changeToFirst: true,
-                                        hideHeader: false,
-                                        onConfirm: (Picker picker, List value) {
-                                          setState(() {
-                                            weekToRepeat = picker.getSelectedValues()[0];
-                                          });
-                                        }
-                                    ).showModal(this.context);
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text('$daysToRepeat Day(s)'),
-                                  onPressed: () async {
-                                    Picker(
-                                        adapter: PickerDataAdapter<int>(
-                                            pickerData: Iterable<int>.generate(32).toList()
-                                        ),
-                                        changeToFirst: true,
-                                        hideHeader: false,
-                                        onConfirm: (Picker picker, List value) {
-                                          setState(() {
-                                            daysToRepeat = picker.getSelectedValues()[0];
-                                          });
-                                        }
-                                    ).showModal(this.context);
-                                  },
-                                )
-                              ],
-                            )),
-                        Offstage(
-                            offstage: !needToRepeat,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                TextButton(
-                                  child: Text('$hoursToRepeat Hour(s)'),
-                                  onPressed: () async {
-                                    Picker(
-                                        adapter: PickerDataAdapter<int>(
-                                            pickerData: Iterable<int>.generate(25).toList()
-                                        ),
-                                        changeToFirst: true,
-                                        hideHeader: false,
-                                        onConfirm: (Picker picker, List value) {
-                                          setState(() {
-                                            hoursToRepeat = picker.getSelectedValues()[0];
-                                          });
-                                        }
-                                    ).showModal(this.context);
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text('$minutesToRepeat Minute(s)'),
-                                  onPressed: () async {
-                                    Picker(
-                                        adapter: PickerDataAdapter<int>(
-                                            pickerData: Iterable<int>.generate(61).toList()
-                                        ),
-                                        changeToFirst: true,
-                                        hideHeader: false,
-                                        onConfirm: (Picker picker, List value) {
-                                          setState(() {
-                                            minutesToRepeat = picker.getSelectedValues()[0];
-                                          });
-                                        }
-                                    ).showModal(this.context);
-                                  },
-                                ),
-                              ],
-                            )),
-                        Divider(
-                          height: 20,
-                          color: Theme.of(context).colorScheme.background,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Important',
-                                style: Theme.of(context).textTheme.bodyLarge),
-                            Switch(
-                              value: isImportant,
-                              onChanged: (enabled) {
-                                setState(() {
-                                  isImportant = enabled;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        //Button()
-                      ].expand(
-                            (widget) => [
-                          widget,
-                          const SizedBox(
-                            height: 24,
-                          )
+                            height: 20,
+                            color: Theme.of(context).colorScheme.background,
+                          )),
+                      Offstage(
+                          offstage: !needToRepeat,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('Repeat every',
+                                  style: Theme.of(context).textTheme.bodyLarge),
+                            ],
+                          )),
+                      Offstage(
+                          offstage: !needToRepeat,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                child: Text('$weekToRepeat Week(s)'),
+                                onPressed: () async {
+                                  Picker(
+                                      adapter: PickerDataAdapter<int>(
+                                          pickerData: Iterable<int>.generate(13)
+                                              .toList()),
+                                      changeToFirst: true,
+                                      hideHeader: false,
+                                      onConfirm: (Picker picker, List value) {
+                                        setState(() {
+                                          weekToRepeat =
+                                              picker.getSelectedValues()[0];
+                                        });
+                                      }).showModal(this.context);
+                                },
+                              ),
+                              TextButton(
+                                child: Text('$daysToRepeat Day(s)'),
+                                onPressed: () async {
+                                  Picker(
+                                      adapter: PickerDataAdapter<int>(
+                                          pickerData: Iterable<int>.generate(32)
+                                              .toList()),
+                                      changeToFirst: true,
+                                      hideHeader: false,
+                                      onConfirm: (Picker picker, List value) {
+                                        setState(() {
+                                          daysToRepeat =
+                                              picker.getSelectedValues()[0];
+                                        });
+                                      }).showModal(this.context);
+                                },
+                              )
+                            ],
+                          )),
+                      Offstage(
+                          offstage: !needToRepeat,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                child: Text('$hoursToRepeat Hour(s)'),
+                                onPressed: () async {
+                                  Picker(
+                                      adapter: PickerDataAdapter<int>(
+                                          pickerData: Iterable<int>.generate(25)
+                                              .toList()),
+                                      changeToFirst: true,
+                                      hideHeader: false,
+                                      onConfirm: (Picker picker, List value) {
+                                        setState(() {
+                                          hoursToRepeat =
+                                              picker.getSelectedValues()[0];
+                                        });
+                                      }).showModal(this.context);
+                                },
+                              ),
+                              TextButton(
+                                child: Text('$minutesToRepeat Minute(s)'),
+                                onPressed: () async {
+                                  Picker(
+                                      adapter: PickerDataAdapter<int>(
+                                          pickerData: Iterable<int>.generate(61)
+                                              .toList()),
+                                      changeToFirst: true,
+                                      hideHeader: false,
+                                      onConfirm: (Picker picker, List value) {
+                                        setState(() {
+                                          minutesToRepeat =
+                                              picker.getSelectedValues()[0];
+                                        });
+                                      }).showModal(this.context);
+                                },
+                              ),
+                            ],
+                          )),
+                      Divider(
+                        height: 20,
+                        color: Theme.of(context).colorScheme.background,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('Important',
+                              style: Theme.of(context).textTheme.bodyLarge),
+                          Switch(
+                            value: isImportant,
+                            onChanged: (enabled) {
+                              setState(() {
+                                isImportant = enabled;
+                              });
+                            },
+                          ),
                         ],
-                      )
-                    ],
-                  ),
+                      ),
+                      //Button()
+                    ].expand(
+                      (widget) => (widget.runtimeType == Offstage &&
+                              (widget as Offstage).offstage)
+                          ? [widget]
+                          : [
+                              widget,
+                              const SizedBox(
+                                height: 24,
+                              )
+                            ],
+                    )
+                  ],
                 ),
               ),
             ),
           ),
         ),
+      ),
     );
   }
 }
