@@ -20,14 +20,15 @@ class _AddAlertPageState extends State<AddAlertPage> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
-  DateTime date = DateTime.now();
+  TimeOfDay nextNotifyTime = TimeOfDay.now();
+  DateTime nextNotifyDate = DateTime.now();
   bool isImportant = false;
   bool needToRepeat = false;
   int daysToRepeat = 0;
   int weekToRepeat = 0;
   int minutesToRepeat = 0;
   int hoursToRepeat = 0;
-  DateTime nextNotifyDate = DateTime.now();
+
 
   Widget saveButton(BuildContext context, GlobalKey<FormState> key) => IconButton(
       icon: const Icon(Icons.save),
@@ -46,21 +47,24 @@ class _AddAlertPageState extends State<AddAlertPage> {
             );
           }
           else{
+            var newNextNotifyDate = DateTime(nextNotifyDate.year, nextNotifyDate.month,
+                nextNotifyDate.day, nextNotifyTime.hour, nextNotifyTime.minute);
+
             newAlert = Alert(isImportant: isImportant,
                 title: title,
                 description: description,
                 setTime: DateTime.now(),
-                expireTime: date,
-                repeatIntervalTimeInDays: daysToRepeat,
-                repeatIntervalTimeInHours: hoursToRepeat,
-                repeatIntervalTimeInMinutes: minutesToRepeat,
-                repeatIntervalTimeInWeeks: weekToRepeat);
+                expireTime: newNextNotifyDate,
+                repeatIntervalTimeInDays: !needToRepeat ? 0 : daysToRepeat,
+                repeatIntervalTimeInHours: !needToRepeat ? 0 : hoursToRepeat,
+                repeatIntervalTimeInMinutes: !needToRepeat ? 0 : minutesToRepeat,
+                repeatIntervalTimeInWeeks: !needToRepeat ? 0 : weekToRepeat);
 
                 AlarmDatabase.instance.create(newAlert).then((newAlert) =>
                     (newAlert.id != null)
                         ? NotificationService().scheduleNotification(
                             id: newAlert.id!,
-                            scheduledNotificationDateTime: date)
+                            scheduledNotificationDateTime: nextNotifyDate)
                         : Future.error("Insertion Failed"));
 
                 Navigator.of(context).pop();
@@ -128,14 +132,19 @@ class _AddAlertPageState extends State<AddAlertPage> {
                           height: 20,
                           color: Theme.of(context).colorScheme.background,
                         ),
-                        FormDatePicker(
-                          date: date,
-                          onChanged: (value) {
+                        FormDateAndTimePicker(
+                          date: nextNotifyDate,
+                          time: nextNotifyTime,
+                          dateOnChanged: (value) {
                             setState(() {
-                              date = value;
+                              nextNotifyDate = value;
                             });
                           },
-                        ),
+                          timeOnChanged: (value) {
+                            setState(() {
+                              nextNotifyTime = value;
+                            });
+                          }),
                         Divider(
                           height: 20,
                           color: Theme.of(context).colorScheme.background,

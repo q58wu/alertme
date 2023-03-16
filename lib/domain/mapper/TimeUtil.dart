@@ -11,4 +11,8 @@ class TimeUtil{
     return DateFormat.yMMMMEEEEd().format(dateTime);
   }
 
+  static DateTime addDurationToDateTime(DateTime dateTime, int weeks, int days, int hours, int minutes){
+    return dateTime.add(Duration(days: weeks * 7 + days, hours: hours, minutes: minutes));
+  }
+
 }
