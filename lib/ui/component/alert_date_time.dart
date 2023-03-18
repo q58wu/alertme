@@ -1,25 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
-class FormDateAndTimePicker extends StatefulWidget {
+class AlertDateTime extends StatefulWidget {
   final DateTime date; // MM/DD/YYYY
   final TimeOfDay time; // HH/MM
   final ValueChanged<DateTime> dateOnChanged;
   final ValueChanged<TimeOfDay> timeOnChanged;
 
-  const FormDateAndTimePicker({
-    required this.date,
-    required this.time,
-    required this.dateOnChanged,
-    required this.timeOnChanged
-  });
+  const AlertDateTime(
+      {super.key,
+      required this.date,
+      required this.time,
+      required this.dateOnChanged,
+      required this.timeOnChanged});
 
   @override
-  State<FormDateAndTimePicker> createState() => FormDateAndTimePickerState();
+  State<AlertDateTime> createState() => AlertDateTimeState();
 }
 
-class FormDateAndTimePickerState extends State<FormDateAndTimePicker> {
+class AlertDateTimeState extends State<AlertDateTime> {
   @override
   Widget build(BuildContext context) {
     return
@@ -85,6 +84,10 @@ class FormDateAndTimePickerState extends State<FormDateAndTimePicker> {
                     },
                   )
                 ]
+            ),
+            Divider(
+              height: 20,
+              color: Theme.of(context).colorScheme.background,
             ),
           ],
     );

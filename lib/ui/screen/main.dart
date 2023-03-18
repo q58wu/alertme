@@ -1,7 +1,7 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
-import 'package:alert_me/ui/add_alert.dart';
-import 'package:alert_me/ui/alert_detail.dart';
+import 'package:alert_me/ui/screen/add_alert.dart';
+import 'package:alert_me/ui/screen/edit_detail.dart';
 import 'package:alert_me/usecase/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
