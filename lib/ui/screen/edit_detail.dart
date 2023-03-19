@@ -4,7 +4,6 @@ import 'package:alert_me/ui/component/alert_title_description.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_picker/flutter_picker.dart';
 import 'package:alert_me/ui/component/alert_date_time.dart';
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -176,6 +175,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
 
                               updatedAlert = Alert(
                                   id: _id,
+                                  status: AlertStatus.pending,
                                   isImportant: isImportant,
                                   title: title,
                                   description: description,

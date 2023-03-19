@@ -10,6 +10,8 @@ import 'package:alert_me/domain/mapper/TimeUtil.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tzl;
 
+import '../component/alert_filter_bar.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService().initNotification();
@@ -25,12 +27,11 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Alert🕗Me',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        fontFamily: 'Shantell_Sans'
+        fontFamily: 'Gilroy',
       ),
-      home: const MyHomePage(title: 'Alert🕗Me'),
+      home: const MyHomePage(title: 'Alert 🕗 Me'),
     );
   }
 }
@@ -45,7 +46,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Alert> allAlert = [];
+  List<Alert> allAlerts = [];
+  List<Alert> displayAlerts = [];
+
+  String _currentFilter = "all";
+  String _sortOrder = 'ascending';
+
   bool isLoading = false;
 
   @override
@@ -63,7 +69,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Future refreshAllAlerts() async {
     setState(() => isLoading = true);
 
-    allAlert = await AlarmDatabase.instance.readAllAlerts();
+    allAlerts = await AlarmDatabase.instance.readAllAlerts();
+    debugPrint(_currentFilter);
+    if (_currentFilter != "all") {
+      displayAlerts= allAlerts.where((alert) => alert.status.toString().split('.').last == _currentFilter).toList();
+    } else {
+      displayAlerts = allAlerts;
+    }
 
     setState(() {
       isLoading = false;
@@ -71,14 +83,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Slidable buildSlidable(BuildContext context, int position) {
-    Alert currentAlert = allAlert[position];
-    return
-      Slidable(
+    Alert currentAlert = displayAlerts[position];
+    return Slidable(
       actionPane: const SlidableScrollActionPane(),
       secondaryActions: [
         IconSlideAction(
           caption: 'Delete',
-          color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
+          color: currentAlert.isImportant
+              ? Theme.of(context).backgroundColor
+              : Theme.of(context).selectedRowColor,
           icon: Icons.delete,
           onTap: () {
             showDialog(
@@ -90,7 +103,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         IconSlideAction(
           caption: 'Renew',
-          color: currentAlert.isImportant ? Theme.of(context).backgroundColor :Theme.of(context).selectedRowColor,
+          color: currentAlert.isImportant
+              ? Theme.of(context).backgroundColor
+              : Theme.of(context).selectedRowColor,
           icon: Icons.access_time,
           onTap: () async {
             Alert updatedAlert = currentAlert.copy(
@@ -112,9 +127,14 @@ class _MyHomePageState extends State<MyHomePage> {
       child: ListTile(
         onTap: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => AlertDetailPage(currentAlert.id)),)
-              .then((value) => setState(() {refreshAllAlerts();}));
-          },
+              .push(
+                MaterialPageRoute(
+                    builder: (context) => AlertDetailPage(currentAlert.id)),
+              )
+              .then((value) => setState(() {
+                    refreshAllAlerts();
+                  }));
+        },
         leading: const FaIcon(
           FontAwesomeIcons.airbnb,
         ),
@@ -131,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey,
           size: 20,
         ),
-        tileColor: currentAlert.isImportant ? Colors.pink.shade50 : Colors.white10,
+        tileColor:
+            currentAlert.isImportant ? Colors.pink.shade50 : Colors.white10,
         dense: false,
       ),
     );
@@ -179,47 +200,53 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          PopupMenuButton(
-              itemBuilder: (context){
-                return [
-                  const PopupMenuItem<int>(
-                    value: 0,
-                    child: Text("Setting"),
-                  ),
-
-                  const PopupMenuItem<int>(
-                    value: 1,
-                    child: Text("About"),
-                  ),
-                ];
-              },
-              onSelected:(value){
-                if(value == 0){
-                      //TODO
-                }else if(value == 1){
-                  //TODO
-                }
-              }
-          )
+          PopupMenuButton(itemBuilder: (context) {
+            return [
+              const PopupMenuItem<int>(
+                value: 0,
+                child: Text("Setting"),
+              ),
+              const PopupMenuItem<int>(
+                value: 1,
+                child: Text("About"),
+              ),
+            ];
+          }, onSelected: (value) {
+            if (value == 0) {
+              //TODO
+            } else if (value == 1) {
+              //TODO
+            }
+          })
         ],
       ),
       body: Center(
-          child: ListView.builder(
-        itemBuilder: (context, position) {
-          return
-            Column(
+          child: Column(children: [
+        AlertFilterBar(
+          onFilterChanged: (String filter) {
+            _currentFilter = filter;
+            refreshAllAlerts();
+          },
+          onOrderChanged: (String order) {
+
+          },
+        ),
+        Expanded(
+            child: ListView.builder(
+          itemBuilder: (context, position) {
+            return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children:[
+                children: [
                   buildSlidable(context, position),
                   Divider(
                     color: Theme.of(context).colorScheme.background,
                   )
-                ]
-          );
-        },
-        itemCount: allAlert.length,
-      )),
+                ]);
+          },
+          itemCount: displayAlerts.length,
+        ))
+      ])),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.of(context)
