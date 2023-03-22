@@ -72,9 +72,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
 
                 AlarmDatabase.instance.create(newAlert).then((newAlert) =>
                     (newAlert.id != null)
-                        ? NotificationService().scheduleNotification(
-                            id: newAlert.id!,
-                            scheduledNotificationDateTime: nextNotifyDate)
+                        ? NotificationService().scheduleNotificationFromAlert(newAlert)
                         : Future.error("Insertion Failed"));
 
                 Navigator.of(context).pop();

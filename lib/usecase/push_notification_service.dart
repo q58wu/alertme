@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../domain/model/alert.dart';
@@ -44,13 +45,14 @@ class NotificationService {
         String? body,
         String? payLoad,
         required DateTime scheduledNotificationDateTime}) async {
+    final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     return notificationsPlugin.zonedSchedule(
         id,
         title,
         body,
         tz.TZDateTime.from(
           scheduledNotificationDateTime,
-          tz.local,
+          tz.getLocation(currentTimeZone),
         ),
         await notificationDetails(),
         androidAllowWhileIdle: true,
