@@ -47,9 +47,9 @@ class AlarmDatabase {
   }
 
   Future<Alert> create(Alert alert) async {
-    print( alert.toJson());
+    print( alert.toMap());
     final db = await instance.database;
-    final id = await db.insert(tableAlert, alert.toJson());
+    final id = await db.insert(tableAlert, alert.toMap());
     return alert.copy(id: id);
   }
 
@@ -85,7 +85,7 @@ class AlarmDatabase {
 
     return db.update(
       tableAlert,
-      alarm.toJson(),
+      alarm.toMap(),
       where: '${AlertFields.id} = ?',
       whereArgs: [alarm.id],
     );

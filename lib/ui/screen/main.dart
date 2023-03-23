@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:alert_me/domain/mapper/TimeUtil.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tzl;
 
+import '../../domain/database/alert_provider.dart';
 import '../component/alert_filter_bar.dart';
 
 void main() {
@@ -25,14 +27,20 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        fontFamily: 'Gilroy',
-      ),
-      home: const MyHomePage(title: 'Alert 🕗 Me'),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => AlertProvider(),
+          ),
+        ],
+        builder: (context, child) => MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                primarySwatch: Colors.green,
+                fontFamily: 'Gilroy',
+              ),
+              home: const MyHomePage(title: 'Alert 🕗 Me'),
+            ));
   }
 }
 
@@ -46,19 +54,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Alert> allAlerts = [];
-  List<Alert> displayAlerts = [];
-
-  String _currentFilter = "all";
-  String _sortOrder = 'ascending';
-
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    refreshAllAlerts();
-  }
 
   @override
   void dispose() {
@@ -66,24 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Future refreshAllAlerts() async {
-    setState(() => isLoading = true);
-
-    allAlerts = await AlarmDatabase.instance.readAllAlerts();
-    debugPrint(_currentFilter);
-    if (_currentFilter != "all") {
-      displayAlerts= allAlerts.where((alert) => alert.status.toString().split('.').last == _currentFilter).toList();
-    } else {
-      displayAlerts = allAlerts;
-    }
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Slidable buildSlidable(BuildContext context, int position) {
-    Alert currentAlert = displayAlerts[position];
+  Slidable buildSlidable(BuildContext context, Alert currentAlert, AlertProvider alertProvider) {
     return Slidable(
       actionPane: const SlidableScrollActionPane(),
       secondaryActions: [
@@ -97,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return buildDeleteAlertDialog(currentAlert);
+                  return buildDeleteAlertDialog(currentAlert, alertProvider);
                 });
           },
         ),
@@ -119,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
             await AlarmDatabase.instance.update(updatedAlert);
             setState(() {
               //TODO:: can possibly just update the updated item here.
-              refreshAllAlerts();
+              alertProvider.retrieveAlerts();
             });
           },
         ),
@@ -132,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => AlertDetailPage(alert: currentAlert)),
               )
               .then((value) => setState(() {
-                    refreshAllAlerts();
+                    alertProvider.retrieveAlerts();
                   }));
         },
         leading: const FaIcon(
@@ -158,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  AlertDialog buildDeleteAlertDialog(Alert currentAlert) {
+  AlertDialog buildDeleteAlertDialog(Alert currentAlert, AlertProvider alertProvider) {
     return AlertDialog(
       title: const Text("Delete Alert"),
       titleTextStyle: const TextStyle(
@@ -179,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 (value) =>
                     NotificationService().cancelNotification(currentAlert.id!));
             setState(() {
-              refreshAllAlerts();
+              alertProvider.retrieveAlerts();
             });
             if (!mounted) return;
             Navigator.of(context).pop();
@@ -220,33 +198,46 @@ class _MyHomePageState extends State<MyHomePage> {
           })
         ],
       ),
-      body: Center(
-          child: Column(children: [
-        AlertFilterBar(
-          onFilterChanged: (String filter) {
-            _currentFilter = filter;
-            refreshAllAlerts();
-          },
-          onOrderChanged: (String order) {
-
-          },
-        ),
-        Expanded(
-            child: ListView.builder(
-          itemBuilder: (context, position) {
-            return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  buildSlidable(context, position),
-                  Divider(
-                    color: Theme.of(context).colorScheme.background,
-                  )
-                ]);
-          },
-          itemCount: displayAlerts.length,
-        ))
-      ])),
+      body: FutureBuilder(
+          future: Provider.of<AlertProvider>(context, listen: false)
+              .retrieveAlerts(),
+          builder: (context, snapshot) => (snapshot.connectionState ==
+                  ConnectionState.waiting)
+              ? const Center(child: CircularProgressIndicator())
+              : Consumer<AlertProvider>(
+                  builder: (context, alertProvider, child) => Column(
+                        children: [
+                          AlertFilterBar(
+                            onFilterChanged: (String filter) {
+                              // TODO Kejun: filter vs sort?
+                              alertProvider.setFilter(filter);
+                            },
+                            onOrderChanged: (String order) {},
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemBuilder: (context, position) {
+                                return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      buildSlidable(
+                                          context,
+                                          alertProvider.items[position],
+                                          alertProvider),
+                                      Divider(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .background,
+                                      )
+                                    ]);
+                              },
+                              itemCount: alertProvider.items.length,
+                            ),
+                          ),
+                        ],
+                      ))),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.of(context)
@@ -254,7 +245,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 MaterialPageRoute(builder: (context) => AddAlertPage()),
               )
               .then((value) => setState(() {
-                    refreshAllAlerts();
+                    Provider.of<AlertProvider>(context, listen: false)
+                        .retrieveAlerts();
                   }));
         },
         child: const Icon(Icons.add),

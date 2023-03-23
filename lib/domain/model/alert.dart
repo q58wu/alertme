@@ -99,7 +99,7 @@ class Alert {
       repeatIntervalTimeInHours: json[AlertFields.repeatIntervalTimeInHours] as int,
       repeatIntervalTimeInMinutes: json[AlertFields.repeatIntervalTimeInMinutes] as int);
 
-  Map<String, Object?> toJson() => {
+  Map<String, Object?> toMap() => {
     AlertFields.id: id,
     AlertFields.status: status.toString().split('.').last,
     AlertFields.title: title,
