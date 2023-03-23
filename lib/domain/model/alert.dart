@@ -3,7 +3,7 @@ const String tableAlert = 'tableAlert';
 class AlertFields {
   static final List<String> values = [
     /// Add all fields
-    id, title, isImportant, description,
+    id, title, status, isImportant, description,
     setTime, expireTime, repeatIntervalTimeInDays,
     repeatIntervalTimeInWeeks, repeatIntervalTimeInHours,
     repeatIntervalTimeInMinutes
@@ -11,6 +11,7 @@ class AlertFields {
 
   static const String id = '_id';
   static const String title = 'title';
+  static const String status = 'status';
   static const String isImportant = 'isImportant';
   static const String description = 'description';
   static const String setTime = 'setTime';
@@ -21,8 +22,16 @@ class AlertFields {
   static const String repeatIntervalTimeInMinutes = 'repeatIntervalTimeInMinutes';
 }
 
+enum AlertStatus {
+  disabled, // Alert is disabled
+  dismissed, // Repeating alert which has been dismissed by the user
+  pending, // Alert is scheduled and waiting to be triggered
+  triggered, // Alert has already been triggered
+}
+
 class Alert {
   final int? id;
+  final AlertStatus status;
   final bool isImportant;
   final String title;
   final String description;
@@ -35,6 +44,7 @@ class Alert {
 
   const Alert(
       {this.id,
+        required this.status,
         required this.isImportant,
         required this.title,
         required this.description,
@@ -47,6 +57,7 @@ class Alert {
 
   Alert copy({
     int? id,
+    AlertStatus? status,
     bool? isImportant,
     int? number,
     String? title,
@@ -60,6 +71,7 @@ class Alert {
   }) =>
       Alert(
           id: id ?? this.id,
+          status: status ?? this.status,
           isImportant: isImportant ?? this.isImportant,
           title: title ?? this.title,
           description: description ?? this.description,
@@ -73,6 +85,10 @@ class Alert {
 
   static Alert fromJson(Map<String, Object?> json) => Alert(
       id: json[AlertFields.id] as int?,
+      status: AlertStatus.values.firstWhere(
+            (status) => status.toString().split('.').last == json[AlertFields.status],
+            orElse: () => AlertStatus.disabled,
+      ),
       isImportant: json[AlertFields.isImportant] == 1,
       title: json[AlertFields.title] as String,
       description: json[AlertFields.description] as String,
@@ -85,6 +101,7 @@ class Alert {
 
   Map<String, Object?> toJson() => {
     AlertFields.id: id,
+    AlertFields.status: status.toString().split('.').last,
     AlertFields.title: title,
     AlertFields.isImportant: isImportant ? 1 : 0,
     AlertFields.description: description,

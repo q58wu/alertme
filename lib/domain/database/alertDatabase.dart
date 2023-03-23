@@ -32,6 +32,7 @@ class AlarmDatabase {
 
     await db.execute('''CREATE TABLE $tableAlert ( 
         ${AlertFields.id} $idType, 
+        ${AlertFields.status} $textType, 
         ${AlertFields.isImportant} $boolType,
         ${AlertFields.title} $textType,
         ${AlertFields.description} $textType,
@@ -46,6 +47,7 @@ class AlarmDatabase {
   }
 
   Future<Alert> create(Alert alert) async {
+    print( alert.toJson());
     final db = await instance.database;
     final id = await db.insert(tableAlert, alert.toJson());
     return alert.copy(id: id);
