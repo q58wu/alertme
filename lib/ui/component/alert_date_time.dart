@@ -65,7 +65,7 @@ class AlertDateTimeState extends State<AlertDateTime> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "${widget.time.hour}:${widget.time.minute}",
+                    '${widget.time.hour.toString().padLeft(2, '0')}:${widget.time.minute.toString().padLeft(2, '0')}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   TextButton(
