@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AlertTitleDescription extends StatelessWidget {
-  final TextEditingController? titleController;
-  final TextEditingController? descriptionController;
-  final GlobalKey<FormState> formKey; // TODO: not sure what's this
+  final String? title;
+  final String? description;
+  final GlobalKey<FormState> formKey; // TODO kejun: not sure what's this
   final ValueChanged<String> titleOnChanged;
   final ValueChanged<String> descriptionOnChanged;
 
   const AlertTitleDescription({super.key,
-    required this.titleController,
-    required this.descriptionController,
+    this.title,
+    this.description,
     required this.formKey,
     required this.titleOnChanged,
     required this.descriptionOnChanged});
@@ -33,7 +33,7 @@ class AlertTitleDescription extends StatelessWidget {
                 }
                 return null;
               },
-              controller: titleController,
+              initialValue: title,
               decoration: const InputDecoration(
                 filled: true,
                 hintText: 'Enter a title...',
@@ -48,7 +48,7 @@ class AlertTitleDescription extends StatelessWidget {
             height: 24,
           ),
           TextFormField(
-            controller: descriptionController,
+            initialValue: description,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               filled: true,

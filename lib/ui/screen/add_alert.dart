@@ -101,8 +101,6 @@ class _AddAlertPageState extends State<AddAlertPage> {
                   children: [
                     ...[
                       AlertTitleDescription(
-                          titleController: null,
-                          descriptionController: null,
                           formKey: _formKey,
                           titleOnChanged: (value) {
                             setState(() {
