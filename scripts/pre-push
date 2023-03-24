@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "▶ Running pre-push hook..."
+
+echo "▶ Running dart fix..."
+DARTFIX_OUTPUT=`dart fix --apply | grep made`
+
+# Run Dart analyze and check for errors
+if [ -n "$DARTFIX_OUTPUT" ]; then
+    echo "⚠️Dart applied automated fixes. Please review and commit again."
+    echo "$DARTFIX_OUTPUT"
+    exit 1
+fi
+
+echo "✅ Pre-push checks passed!"
+exit 0
