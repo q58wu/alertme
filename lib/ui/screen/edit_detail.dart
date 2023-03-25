@@ -11,9 +11,9 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../../usecase/push_notification_service.dart';
 
 class AlertDetailPage extends StatefulWidget {
-  final int? id;
+  final Alert alert;
 
-  const AlertDetailPage(this.id, {super.key});
+  const AlertDetailPage({required this.alert, super.key});
 
   @override
   State createState() => _AlertDetailPageState();
@@ -39,37 +39,24 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   @override
   void initState() {
     super.initState();
-    _id = widget.id ?? -1;
-    initData();
+    Alert currentAlert = widget.alert;
+
+    _id = currentAlert.id ?? -1;
+    title = currentAlert.title;
+    description = currentAlert.description;
+    isImportant = currentAlert.isImportant;
+    daysToRepeat = currentAlert.repeatIntervalTimeInDays;
+    weekToRepeat = currentAlert.repeatIntervalTimeInWeeks;
+    hoursToRepeat = currentAlert.repeatIntervalTimeInHours;
+    minutesToRepeat = currentAlert.repeatIntervalTimeInMinutes;
+    needToRepeat = daysToRepeat != 0 ||
+        weekToRepeat != 0 ||
+        hoursToRepeat != 0 ||
+        minutesToRepeat != 0;
+    nextNotifyDate = currentAlert.expireTime;
+    nextNotifyTime =
+        TimeOfDay(hour: nextNotifyDate.hour, minute: nextNotifyDate.minute);
   }
-
-  Future<void> initData() async {
-    Alert current = await AlarmDatabase.instance.readAlert(_id);
-
-    setState(() {
-      title = current.title;
-      description = current.description;
-      isImportant = current.isImportant;
-      needToRepeat = current.repeatIntervalTimeInDays != 0 ||
-          current.repeatIntervalTimeInWeeks != 0 ||
-          current.repeatIntervalTimeInMinutes != 0 ||
-          current.repeatIntervalTimeInHours != 0;
-      daysToRepeat = current.repeatIntervalTimeInDays;
-      weekToRepeat = current.repeatIntervalTimeInWeeks;
-      hoursToRepeat = current.repeatIntervalTimeInHours;
-      minutesToRepeat = current.repeatIntervalTimeInMinutes;
-      nextNotifyDate = current.expireTime;
-      nextNotifyTime =
-          TimeOfDay(hour: nextNotifyDate.hour, minute: nextNotifyDate.minute);
-      titleTextController.text = title;
-      descriptionTextController.text = description;
-    });
-  }
-
-  TextEditingController titleTextController =
-      TextEditingController.fromValue(const TextEditingValue(text: ""));
-  TextEditingController descriptionTextController =
-      TextEditingController.fromValue(const TextEditingValue(text: ""));
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +76,8 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                   children: [
                     ...[
                       AlertTitleDescription(
-                          titleController: titleTextController,
-                          descriptionController: descriptionTextController,
+                          title: title,
+                          description: description,
                           formKey: _formKey,
                           titleOnChanged: (value) {
                             setState(() {

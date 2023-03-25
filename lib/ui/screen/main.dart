@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.of(context)
               .push(
                 MaterialPageRoute(
-                    builder: (context) => AlertDetailPage(currentAlert.id)),
+                    builder: (context) => AlertDetailPage(alert: currentAlert)),
               )
               .then((value) => setState(() {
                     refreshAllAlerts();
