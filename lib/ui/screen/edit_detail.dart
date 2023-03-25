@@ -119,7 +119,13 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                         },
                       ),
                       AlertOptions(
-                          options: Options(needToRepeat, weekToRepeat, daysToRepeat, hoursToRepeat, minutesToRepeat, isImportant),
+                          options: Options(
+                              needToRepeat,
+                              weekToRepeat,
+                              daysToRepeat,
+                              hoursToRepeat,
+                              minutesToRepeat,
+                              isImportant),
                           optionsOnChange: (value) {
                             setState(() {
                               needToRepeat = value.isRepeat;

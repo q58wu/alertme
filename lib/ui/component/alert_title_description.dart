@@ -7,16 +7,16 @@ class AlertTitleDescription extends StatelessWidget {
   final ValueChanged<String> titleOnChanged;
   final ValueChanged<String> descriptionOnChanged;
 
-  const AlertTitleDescription({super.key,
-    required this.titleController,
-    required this.descriptionController,
-    required this.formKey,
-    required this.titleOnChanged,
-    required this.descriptionOnChanged});
+  const AlertTitleDescription(
+      {super.key,
+      required this.titleController,
+      required this.descriptionController,
+      required this.formKey,
+      required this.titleOnChanged,
+      required this.descriptionOnChanged});
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -26,9 +26,7 @@ class AlertTitleDescription extends StatelessWidget {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: TextFormField(
               validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    value.trim().isEmpty) {
+                if (value == null || value.isEmpty || value.trim().isEmpty) {
                   return 'Task title cannot be empty.';
                 }
                 return null;
@@ -70,8 +68,6 @@ class AlertTitleDescription extends StatelessWidget {
           const SizedBox(
             height: 12,
           ),
-          ]
-    );
-
+        ]);
   }
 }

@@ -1,16 +1,13 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/model/alert.dart';
-import 'package:alert_me/ui/screen/add_alert.dart';
-import 'package:alert_me/ui/screen/edit_detail.dart';
 import 'package:alert_me/usecase/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:alert_me/domain/mapper/TimeUtil.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:timezone/data/latest.dart' as tzl;
-
-import '../component/alert_filter_bar.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,7 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
     allAlerts = await AlarmDatabase.instance.readAllAlerts();
     debugPrint(_currentFilter);
     if (_currentFilter != "all") {
-      displayAlerts= allAlerts.where((alert) => alert.status.toString().split('.').last == _currentFilter).toList();
+      displayAlerts = allAlerts
+          .where((alert) =>
+              alert.status.toString().split('.').last == _currentFilter)
+          .toList();
     } else {
       displayAlerts = allAlerts;
     }
@@ -82,78 +82,34 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Slidable buildSlidable(BuildContext context, int position) {
+  Card buildSlidable(BuildContext context, int position) {
     Alert currentAlert = displayAlerts[position];
-    return Slidable(
-      actionPane: const SlidableScrollActionPane(),
-      secondaryActions: [
-        IconSlideAction(
-          caption: 'Delete',
-          color: currentAlert.isImportant
-              ? Theme.of(context).backgroundColor
-              : Theme.of(context).selectedRowColor,
-          icon: Icons.delete,
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return buildDeleteAlertDialog(currentAlert);
-                });
-          },
+    return Card(
+      color: Colors.green,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Slidable(
+        actionPane: SlidableScrollActionPane(),
+        actionExtentRatio: 0.25,
+        child: ListTile(
+          title: Text(currentAlert.title),
+          subtitle: Text(currentAlert.expireTime.toIso8601String()),
         ),
-        IconSlideAction(
-          caption: 'Renew',
-          color: currentAlert.isImportant
-              ? Theme.of(context).backgroundColor
-              : Theme.of(context).selectedRowColor,
-          icon: Icons.access_time,
-          onTap: () async {
-            Alert updatedAlert = currentAlert.copy(
-                expireTime: currentAlert.expireTime.add(Duration(
-              days: currentAlert.repeatIntervalTimeInDays +
-                  currentAlert.repeatIntervalTimeInWeeks * 7,
-              minutes: currentAlert.repeatIntervalTimeInMinutes,
-              hours: currentAlert.repeatIntervalTimeInHours,
-            )));
-
-            await AlarmDatabase.instance.update(updatedAlert);
-            setState(() {
-              //TODO:: can possibly just update the updated item here.
-              refreshAllAlerts();
-            });
-          },
-        ),
-      ],
-      child: ListTile(
-        onTap: () {
-          Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                    builder: (context) => AlertDetailPage(currentAlert.id)),
-              )
-              .then((value) => setState(() {
-                    refreshAllAlerts();
-                  }));
-        },
-        leading: const FaIcon(
-          FontAwesomeIcons.airbnb,
-        ),
-        title: Text(
-          currentAlert.title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: Text(
-          "Next on ${TimeUtil.convertDatetimeToYMMMED(currentAlert.expireTime)}",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        trailing: const Icon(
-          Icons.alarm,
-          color: Colors.grey,
-          size: 20,
-        ),
-        tileColor:
-            currentAlert.isImportant ? Colors.pink.shade50 : Colors.white10,
-        dense: false,
+        secondaryActions: <Widget>[
+          IconSlideAction(
+            caption: 'More',
+            color: Colors.black45,
+            icon: Icons.more_horiz,
+            onTap: () => print('More'),
+          ),
+          IconSlideAction(
+            caption: 'Delete',
+            color: Colors.red,
+            icon: Icons.delete,
+            onTap: () => print('Delete'),
+          ),
+        ],
       ),
     );
   }
@@ -197,68 +153,90 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          PopupMenuButton(itemBuilder: (context) {
-            return [
-              const PopupMenuItem<int>(
-                value: 0,
-                child: Text("Setting"),
-              ),
-              const PopupMenuItem<int>(
-                value: 1,
-                child: Text("About"),
-              ),
-            ];
-          }, onSelected: (value) {
-            if (value == 0) {
-              //TODO
-            } else if (value == 1) {
-              //TODO
-            }
-          })
-        ],
-      ),
-      body: Center(
-          child: Column(children: [
-        AlertFilterBar(
-          onFilterChanged: (String filter) {
-            _currentFilter = filter;
-            refreshAllAlerts();
-          },
-          onOrderChanged: (String order) {
-
-          },
+        appBar: AppBar(
+          title: Text(widget.title),
+          actions: [
+            PopupMenuButton(itemBuilder: (context) {
+              return [
+                const PopupMenuItem<int>(
+                  value: 0,
+                  child: Text("Setting"),
+                ),
+                const PopupMenuItem<int>(
+                  value: 1,
+                  child: Text("About"),
+                ),
+              ];
+            }, onSelected: (value) {
+              if (value == 0) {
+                //TODO
+              } else if (value == 1) {
+                //TODO
+              }
+            })
+          ],
         ),
-        Expanded(
-            child: ListView.builder(
-          itemBuilder: (context, position) {
-            return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  buildSlidable(context, position),
-                  Divider(
-                    color: Theme.of(context).colorScheme.background,
-                  )
-                ]);
-          },
-          itemCount: displayAlerts.length,
-        ))
-      ])),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.of(context)
-              .push(
-                MaterialPageRoute(builder: (context) => AddAlertPage()),
-              )
-              .then((value) => setState(() {
-                    refreshAllAlerts();
-                  }));
-        },
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        body: SlidingUpPanel(
+          minHeight: 200,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
+          panel: Column(
+            children: [
+              Container(
+                width: 100,
+                height: 8,
+                margin: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.grey,
+                ),
+              ),
+              Row(children: [
+                IconButton(
+                  icon: const Icon(Icons.sort),
+                  onPressed: () {
+                    showTopSnackBar(
+                      Overlay.of(context)!,
+                      const CustomSnackBar.error(
+                        message:
+                            "Please make sure repeat interval is greater than 0 minutes.",
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  onPressed: () {
+                    // Add your filter logic here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                  ),
+                )
+              ]),
+              Expanded(
+                child: ListView.builder(
+                  itemBuilder: (context, position) {
+                    return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          buildSlidable(context, position),
+                        ]);
+                  },
+                  itemCount: displayAlerts.length,
+                ),
+              ),
+            ],
+          ),
+          body: Center(
+            child: Text("This is the Widget behind the sliding panel"),
+          ),
+        ));
   }
 }

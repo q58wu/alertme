@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 class AlertFilterBar extends StatefulWidget {
   final Function(String val) onFilterChanged;
   final Function(String val) onOrderChanged;
 
-  AlertFilterBar({super.key, required this.onFilterChanged, required this.onOrderChanged});
+  AlertFilterBar(
+      {super.key, required this.onFilterChanged, required this.onOrderChanged});
 
   @override
   State<AlertFilterBar> createState() => _AlertFilterBarState();
@@ -15,7 +15,7 @@ class AlertFilterBar extends StatefulWidget {
 class _AlertFilterBarState extends State<AlertFilterBar> {
   String _currentFilter = "all";
   String _currentOrder = 'Ascending';
-  
+
   void showSortBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -26,7 +26,7 @@ class _AlertFilterBarState extends State<AlertFilterBar> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-                padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -106,7 +106,7 @@ class _AlertFilterBarState extends State<AlertFilterBar> {
                   SizedBox(height: 16.0),
                   Row(
                     children: [
-                      FilterChip (
+                      FilterChip(
                         label: Text('All'),
                         selected: _currentFilter == 'all',
                         onSelected: (selected) {
@@ -116,22 +116,22 @@ class _AlertFilterBarState extends State<AlertFilterBar> {
                         },
                       ),
                       SizedBox(width: 8.0),
-                      FilterChip (
+                      FilterChip(
                         label: Text('Pending'),
                         selected: _currentFilter == 'pending',
                         onSelected: (selected) {
                           setState(() {
-                            if (selected) _currentFilter ='pending';
+                            if (selected) _currentFilter = 'pending';
                           });
                         },
                       ),
                       SizedBox(width: 8.0),
-                      FilterChip (
+                      FilterChip(
                         label: Text('Triggered'),
                         selected: _currentFilter == 'triggered',
                         onSelected: (selected) {
                           setState(() {
-                            if (selected) _currentFilter ='triggered';
+                            if (selected) _currentFilter = 'triggered';
                           });
                         },
                       ),
@@ -157,46 +157,45 @@ class _AlertFilterBarState extends State<AlertFilterBar> {
 
   @override
   Widget build(BuildContext context) {
-    return
-      Container(
-        color: Colors.grey[200],
-        padding: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  showSortBottomSheet();
-                },
-                icon: Icon(Icons.sort, color: Colors.grey[300]),
-                label: Text(
-                  'Sort',
-                  style: TextStyle(color: Colors.black),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                ),
+    return Container(
+      color: Colors.grey[200],
+      padding: EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                showSortBottomSheet();
+              },
+              icon: Icon(Icons.sort, color: Colors.grey[300]),
+              label: Text(
+                'Sort',
+                style: TextStyle(color: Colors.black),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
               ),
             ),
-            SizedBox(width: 10),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  showFilterBottomSheet();
-                },
-                icon: Icon(Icons.filter_list, color: Colors.grey[300]),
-                label: Text(
-                  'Filter',
-                  style: TextStyle(color: Colors.black),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                showFilterBottomSheet();
+              },
+              icon: Icon(Icons.filter_list, color: Colors.grey[300]),
+              label: Text(
+                'Filter',
+                style: TextStyle(color: Colors.black),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }

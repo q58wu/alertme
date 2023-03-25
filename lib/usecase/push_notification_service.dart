@@ -6,11 +6,11 @@ import '../domain/model/alert.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   Future<void> initNotification() async {
     AndroidInitializationSettings initializationSettingsAndroid =
-    const AndroidInitializationSettings('flutter_logo');
+        const AndroidInitializationSettings('flutter_logo');
 
     var initializationSettingsIOS = DarwinInitializationSettings(
         requestAlertPermission: true,
@@ -41,11 +41,12 @@ class NotificationService {
 
   Future scheduleNotification(
       {int id = 0,
-        String? title,
-        String? body,
-        String? payLoad,
-        required DateTime scheduledNotificationDateTime}) async {
-    final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+      String? title,
+      String? body,
+      String? payLoad,
+      required DateTime scheduledNotificationDateTime}) async {
+    final String currentTimeZone =
+        await FlutterNativeTimezone.getLocalTimezone();
     return notificationsPlugin.zonedSchedule(
         id,
         title,
@@ -57,7 +58,7 @@ class NotificationService {
         await notificationDetails(),
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime);
+            UILocalNotificationDateInterpretation.absoluteTime);
   }
 
   Future scheduleNotificationFromAlert(Alert alert) async {
@@ -75,5 +76,4 @@ class NotificationService {
   Future<List<PendingNotificationRequest>> getAllNotifications() async {
     return notificationsPlugin.pendingNotificationRequests();
   }
-
 }

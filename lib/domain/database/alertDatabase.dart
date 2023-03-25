@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:alert_me/domain/model/alert.dart';
 
-
 class AlarmDatabase {
   static final AlarmDatabase instance = AlarmDatabase._init();
 
@@ -47,7 +46,7 @@ class AlarmDatabase {
   }
 
   Future<Alert> create(Alert alert) async {
-    print( alert.toJson());
+    print(alert.toJson());
     final db = await instance.database;
     final id = await db.insert(tableAlert, alert.toJson());
     return alert.copy(id: id);
@@ -73,7 +72,8 @@ class AlarmDatabase {
   Future<List<Alert>> readAllAlerts() async {
     final db = await instance.database;
 
-    const orderBy = '${AlertFields.isImportant} DESC, ${AlertFields.expireTime} ASC';
+    const orderBy =
+        '${AlertFields.isImportant} DESC, ${AlertFields.expireTime} ASC';
 
     final result = await db.query(tableAlert, orderBy: orderBy);
 

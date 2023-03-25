@@ -19,7 +19,8 @@ class AlertFields {
   static const String repeatIntervalTimeInDays = 'repeatIntervalTimeInDays';
   static const String repeatIntervalTimeInWeeks = 'repeatIntervalTimeInWeeks';
   static const String repeatIntervalTimeInHours = 'repeatIntervalTimeInHours';
-  static const String repeatIntervalTimeInMinutes = 'repeatIntervalTimeInMinutes';
+  static const String repeatIntervalTimeInMinutes =
+      'repeatIntervalTimeInMinutes';
 }
 
 enum AlertStatus {
@@ -44,72 +45,80 @@ class Alert {
 
   const Alert(
       {this.id,
-        required this.status,
-        required this.isImportant,
-        required this.title,
-        required this.description,
-        required this.setTime,
-        required this.expireTime,
-        required this.repeatIntervalTimeInDays,
-        required this.repeatIntervalTimeInWeeks,
-        required this.repeatIntervalTimeInHours,
-        required this.repeatIntervalTimeInMinutes});
+      required this.status,
+      required this.isImportant,
+      required this.title,
+      required this.description,
+      required this.setTime,
+      required this.expireTime,
+      required this.repeatIntervalTimeInDays,
+      required this.repeatIntervalTimeInWeeks,
+      required this.repeatIntervalTimeInHours,
+      required this.repeatIntervalTimeInMinutes});
 
-  Alert copy({
-    int? id,
-    AlertStatus? status,
-    bool? isImportant,
-    int? number,
-    String? title,
-    String? description,
-    DateTime? setTime,
-    DateTime? expireTime,
-    int? repeatIntervalTimeInDays,
-    int? repeatIntervalTimeInWeeks,
-    int? repeatIntervalTimeInHours,
-    int? repeatIntervalTimeInMinutes
-  }) =>
+  Alert copy(
+          {int? id,
+          AlertStatus? status,
+          bool? isImportant,
+          int? number,
+          String? title,
+          String? description,
+          DateTime? setTime,
+          DateTime? expireTime,
+          int? repeatIntervalTimeInDays,
+          int? repeatIntervalTimeInWeeks,
+          int? repeatIntervalTimeInHours,
+          int? repeatIntervalTimeInMinutes}) =>
       Alert(
-          id: id ?? this.id,
-          status: status ?? this.status,
-          isImportant: isImportant ?? this.isImportant,
-          title: title ?? this.title,
-          description: description ?? this.description,
-          setTime: setTime ?? this.setTime,
-          expireTime: expireTime ?? this.expireTime,
-          repeatIntervalTimeInDays: repeatIntervalTimeInDays ?? this.repeatIntervalTimeInDays,
-          repeatIntervalTimeInWeeks: repeatIntervalTimeInWeeks ?? this.repeatIntervalTimeInWeeks,
-          repeatIntervalTimeInHours: repeatIntervalTimeInHours ?? this.repeatIntervalTimeInHours,
-          repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes ?? this.repeatIntervalTimeInMinutes,
+        id: id ?? this.id,
+        status: status ?? this.status,
+        isImportant: isImportant ?? this.isImportant,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        setTime: setTime ?? this.setTime,
+        expireTime: expireTime ?? this.expireTime,
+        repeatIntervalTimeInDays:
+            repeatIntervalTimeInDays ?? this.repeatIntervalTimeInDays,
+        repeatIntervalTimeInWeeks:
+            repeatIntervalTimeInWeeks ?? this.repeatIntervalTimeInWeeks,
+        repeatIntervalTimeInHours:
+            repeatIntervalTimeInHours ?? this.repeatIntervalTimeInHours,
+        repeatIntervalTimeInMinutes:
+            repeatIntervalTimeInMinutes ?? this.repeatIntervalTimeInMinutes,
       );
 
   static Alert fromJson(Map<String, Object?> json) => Alert(
       id: json[AlertFields.id] as int?,
       status: AlertStatus.values.firstWhere(
-            (status) => status.toString().split('.').last == json[AlertFields.status],
-            orElse: () => AlertStatus.disabled,
+        (status) =>
+            status.toString().split('.').last == json[AlertFields.status],
+        orElse: () => AlertStatus.disabled,
       ),
       isImportant: json[AlertFields.isImportant] == 1,
       title: json[AlertFields.title] as String,
       description: json[AlertFields.description] as String,
       setTime: DateTime.parse(json[AlertFields.setTime] as String),
       expireTime: DateTime.parse(json[AlertFields.expireTime] as String),
-      repeatIntervalTimeInDays: json[AlertFields.repeatIntervalTimeInDays] as int,
-      repeatIntervalTimeInWeeks: json[AlertFields.repeatIntervalTimeInWeeks] as int,
-      repeatIntervalTimeInHours: json[AlertFields.repeatIntervalTimeInHours] as int,
-      repeatIntervalTimeInMinutes: json[AlertFields.repeatIntervalTimeInMinutes] as int);
+      repeatIntervalTimeInDays:
+          json[AlertFields.repeatIntervalTimeInDays] as int,
+      repeatIntervalTimeInWeeks:
+          json[AlertFields.repeatIntervalTimeInWeeks] as int,
+      repeatIntervalTimeInHours:
+          json[AlertFields.repeatIntervalTimeInHours] as int,
+      repeatIntervalTimeInMinutes:
+          json[AlertFields.repeatIntervalTimeInMinutes] as int);
 
   Map<String, Object?> toJson() => {
-    AlertFields.id: id,
-    AlertFields.status: status.toString().split('.').last,
-    AlertFields.title: title,
-    AlertFields.isImportant: isImportant ? 1 : 0,
-    AlertFields.description: description,
-    AlertFields.setTime: setTime.toIso8601String(),
-    AlertFields.expireTime: expireTime.toIso8601String(),
-    AlertFields.repeatIntervalTimeInDays: repeatIntervalTimeInDays,
-    AlertFields.repeatIntervalTimeInWeeks: repeatIntervalTimeInWeeks,
-    AlertFields.repeatIntervalTimeInHours: repeatIntervalTimeInHours,
-    AlertFields.repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes
-  };
+        AlertFields.id: id,
+        AlertFields.status: status.toString().split('.').last,
+        AlertFields.title: title,
+        AlertFields.isImportant: isImportant ? 1 : 0,
+        AlertFields.description: description,
+        AlertFields.setTime: setTime.toIso8601String(),
+        AlertFields.expireTime: expireTime.toIso8601String(),
+        AlertFields.repeatIntervalTimeInDays: repeatIntervalTimeInDays,
+        AlertFields.repeatIntervalTimeInWeeks: repeatIntervalTimeInWeeks,
+        AlertFields.repeatIntervalTimeInHours: repeatIntervalTimeInHours,
+        AlertFields.repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes
+      };
 }
