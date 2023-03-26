@@ -301,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Container(
-        color: Colors.indigo,
+        color: Colors.white,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

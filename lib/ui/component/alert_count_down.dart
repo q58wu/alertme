@@ -54,16 +54,34 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
     if (_days == null) {
       return Text('Expired');
     } else {
-      return Row(
-        children: [
-          Expanded(
-            child: Text('$_days days\n$_hours hours\n$_minutes minutes',
+      return SizedBox(
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: 150,
+        child: Row(
+          children: [
+            Text('$_days days\n$_hours hours\n$_minutes minutes',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 35,
                   fontWeight: FontWeight.w200,
                 )),
-          ),
-        ],
+            const VerticalDivider(
+              width: 20,
+              thickness: 1,
+              indent: 20,
+              endIndent: 20,
+              color: Colors.grey,
+            ),
+            Expanded(
+              child: Text(
+                alert.title,
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w200,
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     }
   }
