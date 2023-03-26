@@ -209,10 +209,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           AlertFilterBar(
                             onFilterChanged: (String filter) {
-                              // TODO Kejun: filter vs sort?
                               alertProvider.setFilter(filter);
                             },
-                            onOrderChanged: (String order) {},
+                            onOrderChanged: (String order) {
+                              alertProvider.setOrder(order);
+                            },
                           ),
                           Expanded(
                             child: ListView.builder(
