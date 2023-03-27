@@ -30,17 +30,19 @@ class AlertProvider extends ChangeNotifier {
 
   Future<void> setFilter(String filter) async {
     _filter = filter;
-    runFilter();
+    await runFilter();
     runSort();
     notifyListeners();
   }
 
-  void runFilter() {
+  Future<void> runFilter() async {
     if (_filter == "all") {
-      retrieveAlerts(shouldNotify: false);
+      await retrieveAlerts(shouldNotify: false);
     } else if (_filter == "pending" || _filter == "triggered") {
-      retrieveAlerts(shouldNotify: false);
-      _items= _items.where((alert) => alert.status.toString().split('.').last == _filter).toList();
+      await retrieveAlerts(shouldNotify: false);
+      _items = _items
+          .where((alert) => alert.status.toString().split('.').last == _filter)
+          .toList();
     }
   }
 
