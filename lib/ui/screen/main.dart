@@ -55,13 +55,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  // final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+
   @override
   void dispose() {
     AlarmDatabase.instance.close();
     super.dispose();
   }
 
-  Slidable buildSlidable(BuildContext context, Alert currentAlert, AlertProvider alertProvider) {
+  Slidable buildSlidable(BuildContext context, int position, Animation<double> animation, AlertProvider alertProvider) {
+    Alert currentAlert = alertProvider.items[position];
     return Slidable(
       actionPane: const SlidableScrollActionPane(),
       secondaryActions: [
@@ -72,10 +75,11 @@ class _MyHomePageState extends State<MyHomePage> {
               : Theme.of(context).selectedRowColor,
           icon: Icons.delete,
           onTap: () {
+
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return buildDeleteAlertDialog(currentAlert, alertProvider);
+                  return buildDeleteAlertDialog(context, position, animation, alertProvider);
                 });
           },
         ),
@@ -136,7 +140,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  AlertDialog buildDeleteAlertDialog(Alert currentAlert, AlertProvider alertProvider) {
+  AlertDialog buildDeleteAlertDialog(BuildContext context, int position, Animation animation, AlertProvider alertProvider) {
+    Alert currentAlert = alertProvider.items[position];
     return AlertDialog(
       title: const Text("Delete Alert"),
       titleTextStyle: const TextStyle(
@@ -153,12 +158,11 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text("Cancel")),
         ElevatedButton(
           onPressed: () async {
+            removeItemWithAnimation(context, position, animation, alertProvider);
             await AlarmDatabase.instance.delete(currentAlert.id!).then(
                 (value) =>
                     NotificationService().cancelNotification(currentAlert.id!));
-            setState(() {
-              alertProvider.retrieveAlerts();
-            });
+            await alertProvider.retrieveAlerts();
             if (!mounted) return;
             Navigator.of(context).pop();
           },
@@ -215,26 +219,20 @@ class _MyHomePageState extends State<MyHomePage> {
                               alertProvider.setOrder(order);
                             },
                           ),
+
                           Expanded(
-                            child: ListView.builder(
-                              itemBuilder: (context, position) {
-                                return Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      buildSlidable(
-                                          context,
-                                          alertProvider.items[position],
-                                          alertProvider),
-                                      Divider(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .background,
-                                      )
-                                    ]);
+                            child: AnimatedList(
+                              key: alertProvider.listKey,
+                              initialItemCount: alertProvider.items.length,
+                              itemBuilder: (context, position, animation) {
+                                if (position < alertProvider.items.length) {
+                                  return buildListItem(
+                                      context, position, animation,
+                                      alertProvider);
+                                } else {
+                                  return Container();
+                                }
                               },
-                              itemCount: alertProvider.items.length,
                             ),
                           ),
                         ],
@@ -253,5 +251,27 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget buildListItem(BuildContext context, int position, Animation<double> animation, AlertProvider alertProvider) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            buildSlidable(context, position, animation, alertProvider),
+            Divider(
+              color: Theme.of(context).colorScheme.background,
+            )
+          ]),
+    );
+  }
+
+  void removeItemWithAnimation(BuildContext context, int position, Animation animation, AlertProvider alertProvider) {
+    builder(context, animation) {
+      return buildListItem(context, position, animation, alertProvider);
+    }
+    alertProvider.listKey.currentState?.removeItem(position, builder);
   }
 }

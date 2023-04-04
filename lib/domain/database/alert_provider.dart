@@ -12,6 +12,9 @@ class AlertProvider extends ChangeNotifier {
   String _sortOrder = 'Ascending';
   // TODO Kejun: need to improve above
 
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  GlobalKey<AnimatedListState> get listKey => _listKey;
+
   Future insertDatabase(Alert alert) async {
     AlarmDatabase.instance.create(alert);
     _items.add(alert);
@@ -32,6 +35,7 @@ class AlertProvider extends ChangeNotifier {
     _filter = filter;
     await runFilter();
     runSort();
+
     notifyListeners();
   }
 
