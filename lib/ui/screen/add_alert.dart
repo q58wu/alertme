@@ -1,11 +1,12 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
+import 'package:alert_me/domain/mapper/TimeUtil.dart';
 import 'package:alert_me/domain/model/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_me/ui/component/alert_date_time.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:workmanager/workmanager.dart';
 
-import '../../usecase/push_notification_service.dart';
 import '../component/alert_options.dart';
 import '../component/alert_title_description.dart';
 
@@ -47,7 +48,21 @@ class _AddAlertPageState extends State<AddAlertPage> {
                         "Please make sure repeat interval is greater than 0 minutes.",
                   ),
                 );
-              } else {
+              }
+              else if (needToRepeat &&
+                  weekToRepeat == 0 &&
+                  daysToRepeat == 0 &&
+                  hoursToRepeat == 0 &&
+                  minutesToRepeat < 15){
+                showTopSnackBar(
+                  Overlay.of(context)!,
+                  const CustomSnackBar.error(
+                    message:
+                    "Please make sure repeat interval is at least 15 minutes.",
+                  ),
+                );
+              }
+              else {
                 var newNextNotifyDate = DateTime(
                     nextNotifyDate.year,
                     nextNotifyDate.month,
@@ -70,9 +85,19 @@ class _AddAlertPageState extends State<AddAlertPage> {
                     repeatIntervalTimeInWeeks:
                         !needToRepeat ? 0 : weekToRepeat);
 
-                AlarmDatabase.instance.create(newAlert).then((newAlert) =>
-                    (newAlert.id != null)
-                        ? NotificationService().scheduleNotificationFromAlert(newAlert)
+                AlarmDatabase.instance
+                    .create(newAlert)
+                    .then((newAlert) => (newAlert.id != null)
+                        ? Workmanager().registerPeriodicTask(
+                            newAlert.id.toString(),
+                            newAlert.title,
+                            initialDelay: TimeUtil.getDurationFromNowTo(newAlert.expireTime),
+                            frequency: Duration(days: newAlert.repeatIntervalTimeInDays + newAlert.repeatIntervalTimeInWeeks * 7,
+                                hours: newAlert.repeatIntervalTimeInHours,
+                                minutes: newAlert.repeatIntervalTimeInMinutes
+                            ),
+                            inputData: {"title": newAlert.title, "body": newAlert.description, "id": newAlert.id}
+                          )
                         : Future.error("Insertion Failed"));
 
                 Navigator.of(context).pop();

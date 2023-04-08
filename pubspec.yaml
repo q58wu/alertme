@@ -44,6 +44,7 @@ dependencies:
   timezone: ^0.9.1
   flutter_native_timezone: ^2.0.0
   easy_loading_button: ^0.3.2
+  workmanager: 0.5.1
   flutter_picker:
     git:
       url: https://github.com/yangyxd/flutter_picker.git
