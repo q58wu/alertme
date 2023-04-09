@@ -70,4 +70,11 @@ class AlertProvider extends ChangeNotifier {
     }
     _items.removeAt(index);
   }
+
+  void insertItemToList(Alert alert) {
+    _items.add(alert);
+    runSort();
+    int index = _items.indexOf(alert);
+    _listKey.currentState?.insertItem(index);
+  }
 }

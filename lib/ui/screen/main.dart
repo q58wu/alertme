@@ -67,7 +67,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   @override
   void dispose() {
@@ -241,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("main gets rebuilt...");
     return Scaffold(
       body: FutureBuilder(
           future: Provider.of<AlertProvider>(context, listen: false)
@@ -253,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         minHeight: 80,
                         maxHeight: 200,
                         defaultPanelState: PanelState.CLOSED,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24.0),
                           topRight: Radius.circular(24.0),
                         ),
@@ -262,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               width: 100,
                               height: 4,
-                              margin: EdgeInsets.symmetric(vertical: 10),
+                              margin: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.grey,
@@ -282,11 +282,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                           builder: (context) =>
                                               const AddAlertPage()),
                                     )
-                                    .then((value) => setState(() {
-                                          Provider.of<AlertProvider>(context,
-                                                  listen: false)
-                                              .retrieveAlerts();
-                                        }));
+                                    .then((alert) =>
+                                        alertProvider.insertItemToList(alert));
                               },
                             ),
                             CountdownTimerWidget()
@@ -294,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         body: Column(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 40,
                             ),
                             Row(

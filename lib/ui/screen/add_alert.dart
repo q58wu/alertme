@@ -87,23 +87,29 @@ class _AddAlertPageState extends State<AddAlertPage> {
 
                 AlarmDatabase.instance
                     .create(newAlert)
-                    .then((newAlert) => (newAlert.id != null)
-                        ? Workmanager().registerPeriodicTask(
-                            newAlert.id.toString(),
-                            newAlert.title,
-                            initialDelay: TimeUtil.getDurationFromNowTo(newAlert.expireTime),
-                            frequency: Duration(days: newAlert.repeatIntervalTimeInDays + newAlert.repeatIntervalTimeInWeeks * 7,
-                                hours: newAlert.repeatIntervalTimeInHours,
-                                minutes: newAlert.repeatIntervalTimeInMinutes
-                            ),
-                            inputData: {"title": newAlert.title, "body": newAlert.description, "id": newAlert.id}
-                          )
-                        : Future.error("Insertion Failed"));
-
-                Navigator.of(context).pop();
+                    .then((newAlertCreated) =>  (newAlertCreated.id != null)
+                    ?
+                onCreateAlertSuccess(newAlertCreated)
+                    : Future.error("Insertion Failed"));
               }
             }
           });
+
+  Future<void> onCreateAlertSuccess(Alert newAlertCreated) async {
+    await Workmanager().registerPeriodicTask(
+        newAlertCreated.id.toString(),
+        newAlertCreated.title,
+        initialDelay: TimeUtil.getDurationFromNowTo(newAlertCreated.expireTime),
+        frequency: Duration(days: newAlertCreated.repeatIntervalTimeInDays + newAlertCreated.repeatIntervalTimeInWeeks * 7,
+            hours: newAlertCreated.repeatIntervalTimeInHours,
+            minutes: newAlertCreated.repeatIntervalTimeInMinutes
+        ),
+        inputData: {"title": newAlertCreated.title, "body": newAlertCreated.description, "id": newAlertCreated.id}
+    );
+    if (context.mounted) {
+      Navigator.of(context).pop(newAlertCreated);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
