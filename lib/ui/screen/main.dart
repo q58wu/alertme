@@ -9,14 +9,26 @@ import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:timezone/data/latest.dart' as tzl;
 import 'package:timezone/timezone.dart' as tz;
-
 import '../../domain/database/alert_provider.dart';
 import '../component/alert_control_bar.dart';
 import '../component/alert_count_down.dart';
 import 'add_alert.dart';
+import 'package:workmanager/workmanager.dart';
 
-void main() {
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    NotificationService().showNotification(id: inputData?["id"], title: inputData?["title"],body: inputData?["body"]);
+    var dbAlert = await AlarmDatabase.instance.readAlert(inputData?["id"]);
+    AlarmDatabase.instance.update(dbAlert.copy(status: AlertStatus.triggered));
+    return Future.value(true);
+  });
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Workmanager().initialize(
+    callbackDispatcher,
+  );
   NotificationService().initNotification();
   tz.initializeDatabase([]);
   tzl.initializeTimeZones();

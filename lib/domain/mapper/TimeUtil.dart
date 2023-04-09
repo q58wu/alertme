@@ -15,4 +15,13 @@ class TimeUtil{
     return dateTime.add(Duration(days: weeks * 7 + days, hours: hours, minutes: minutes));
   }
 
+  static Duration getDurationFromNowTo(DateTime targetTime){
+    Duration diff = targetTime.difference(DateTime.now());
+    if(diff.isNegative)
+      return const Duration();
+    else {
+      return diff;
+    }
+  }
+
 }
