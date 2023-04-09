@@ -63,4 +63,11 @@ class AlertProvider extends ChangeNotifier {
       _items.sort((a, b) => -a.expireTime.compareTo(b.expireTime));
     }
   }
+
+  void removeItemFromList(int index, {AnimatedRemovedItemBuilder? builder}) {
+    if (builder != null) {
+      _listKey.currentState?.removeItem(index, builder);
+    }
+    _items.removeAt(index);
+  }
 }
