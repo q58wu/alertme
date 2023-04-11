@@ -7,6 +7,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../domain/util/WorkManager+AlertHelper.dart';
 import '../component/alert_options.dart';
 import '../component/alert_title_description.dart';
 
@@ -96,16 +97,7 @@ class _AddAlertPageState extends State<AddAlertPage> {
           });
 
   Future<void> onCreateAlertSuccess(Alert newAlertCreated) async {
-    await Workmanager().registerPeriodicTask(
-        newAlertCreated.id.toString(),
-        newAlertCreated.title,
-        initialDelay: TimeUtil.getDurationFromNowTo(newAlertCreated.expireTime),
-        frequency: Duration(days: newAlertCreated.repeatIntervalTimeInDays + newAlertCreated.repeatIntervalTimeInWeeks * 7,
-            hours: newAlertCreated.repeatIntervalTimeInHours,
-            minutes: newAlertCreated.repeatIntervalTimeInMinutes
-        ),
-        inputData: {"title": newAlertCreated.title, "body": newAlertCreated.description, "id": newAlertCreated.id}
-    );
+    await WorkManagerAlertHelper.createNotification(newAlertCreated);
     if (context.mounted) {
       Navigator.of(context).pop(newAlertCreated);
     }

@@ -52,22 +52,18 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
   @override
   Widget build(BuildContext context) {
     if (_days == null) {
-      return SizedBox(
-          width: MediaQuery.of(context).size.width * 0.8,
-          height: 100,
-          child: Center(
-              child: Text('You are all clear.\nTry adding some new alerts!',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ))));
+      return Wrap(children: <Widget>[
+        Center(
+            child: Text('You are all clear.\nTry adding some new alerts!',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                )))
+      ]);
     } else {
-      return SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: 100,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      return Wrap(
+        direction: Axis.vertical,
+        children:  <Widget>[
             Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -90,8 +86,7 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
                   fontWeight: FontWeight.bold,
                 )),
             Spacer(),
-          ],
-        ),
+        ]
       );
     }
   }

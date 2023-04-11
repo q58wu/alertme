@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 const String tableAlert = 'tableAlert';
 
 class AlertFields {
@@ -112,4 +114,11 @@ class Alert {
     AlertFields.repeatIntervalTimeInHours: repeatIntervalTimeInHours,
     AlertFields.repeatIntervalTimeInMinutes: repeatIntervalTimeInMinutes
   };
+
+  bool isRepeating(){
+    return repeatIntervalTimeInDays != 0 ||
+        repeatIntervalTimeInWeeks != 0 ||
+        repeatIntervalTimeInHours != 0 ||
+        repeatIntervalTimeInMinutes != 0;
+  }
 }
