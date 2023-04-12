@@ -67,7 +67,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   @override
   void dispose() {
@@ -75,98 +74,24 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Card buildSlidableCard(BuildContext context, int position,
-      Animation<double> animation, AlertProvider alertProvider) {
-    Alert currentAlert = alertProvider.items[position];
+  Card buildSlidableCard(
+      BuildContext context,
+      Alert alertToBuild,
+      int listPosition,
+      Animation<double> animation,
+      {Function(Alert? val)? onItemEditCallback,
+      Function(Alert val)? onItemDeleteCallback}) {
     return Card(
-        margin: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.black, width: 1),
+          side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: ClipRect(
           child: Slidable(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, top: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            currentAlert.title,
-                            softWrap: false,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.more_vert),
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          AlertDetailPage(alert: currentAlert)),
-                                )
-                                .then((value) => setState(() {
-                                      alertProvider.retrieveAlerts();
-                                    }));
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      currentAlert.description,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      children: [
-                        Icon(Icons.alarm_sharp),
-                        SizedBox(width: 8),
-                        Text(
-                          "${TimeUtil.convertDatetimeToYMMMED(currentAlert.expireTime)}",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        Chip(
-                          label: Text('Important'),
-                          backgroundColor: Colors.redAccent[100],
-                        ),
-                        Chip(
-                          label: Text('Repeating'),
-                          backgroundColor: Colors.greenAccent[100],
-                        ),
-                        Chip(
-                          label: Text('custom tag'),
-                          backgroundColor: Colors.grey[100],
-                        ),
-                      ],
-                    ),
-                  )
-                ]),
             endActionPane: ActionPane(
-              motion: ScrollMotion(),
+              motion: const ScrollMotion(),
               children: [
                 SlidableAction(
                   // An action can be bigger than the others.
@@ -177,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: (BuildContext context) {},
                 ),
                 SlidableAction(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(10),
                       bottomRight: Radius.circular(10)),
                   backgroundColor: Colors.red,
@@ -185,23 +110,105 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icons.save,
                   label: 'Delete',
                   onPressed: (BuildContext context) {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return buildDeleteAlertDialog(
-                              context, position, animation, alertProvider);
-                        });
+                    if (onItemDeleteCallback != null) {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return buildDeleteAlertDialog(
+                                context, alertToBuild, listPosition, animation, onItemDeleteCallback);
+                          });
+                    }
                   },
                 ),
               ],
             ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            alertToBuild.title,
+                            softWrap: false,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AlertDetailPage(alert: alertToBuild)),
+                                )
+                                .then((value) => setState(() {
+                                      if (onItemEditCallback != null) {
+                                        // TODO kejun
+                                        onItemEditCallback(null);
+                                      }
+                                    }));
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      alertToBuild.description,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.alarm_sharp),
+                        const SizedBox(width: 8),
+                        Text(
+                          TimeUtil.convertDatetimeToYMMMED(alertToBuild.expireTime),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        Chip(
+                          label: const Text('Important'),
+                          backgroundColor: Colors.redAccent[100],
+                        ),
+                        Chip(
+                          label: const Text('Repeating'),
+                          backgroundColor: Colors.greenAccent[100],
+                        ),
+                        Chip(
+                          label: const Text('custom tag'),
+                          backgroundColor: Colors.grey[100],
+                        ),
+                      ],
+                    ),
+                  )
+                ]),
           ),
         ));
   }
 
-  AlertDialog buildDeleteAlertDialog(BuildContext context, int position,
-      Animation animation, AlertProvider alertProvider) {
-    Alert currentAlert = alertProvider.items[position];
+  AlertDialog buildDeleteAlertDialog(BuildContext context, Alert alert,
+      int listPosition, Animation animation, Function(Alert val) onItemDeleteCallback) {
     return AlertDialog(
       title: const Text("Delete Alert"),
       titleTextStyle: const TextStyle(
@@ -218,13 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text("Cancel")),
         ElevatedButton(
           onPressed: () async {
-            removeItemWithAnimation(
-                context, position, animation, alertProvider);
-            await AlarmDatabase.instance.delete(currentAlert.id!).then(
-                (value) =>
-                    NotificationService().cancelNotification(currentAlert.id!));
-            await alertProvider.retrieveAlerts();
-            if (!mounted) return;
+            onItemDeleteCallback(alert);
             Navigator.of(context).pop();
           },
           style: const ButtonStyle(
@@ -239,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("main gets rebuilt...");
     return Scaffold(
       body: FutureBuilder(
           future: Provider.of<AlertProvider>(context, listen: false)
@@ -251,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         minHeight: 80,
                         maxHeight: 200,
                         defaultPanelState: PanelState.CLOSED,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24.0),
                           topRight: Radius.circular(24.0),
                         ),
@@ -260,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               width: 100,
                               height: 4,
-                              margin: EdgeInsets.symmetric(vertical: 10),
+                              margin: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.grey,
@@ -280,11 +282,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                           builder: (context) =>
                                               const AddAlertPage()),
                                     )
-                                    .then((value) => setState(() {
-                                          Provider.of<AlertProvider>(context,
-                                                  listen: false)
-                                              .retrieveAlerts();
-                                        }));
+                                    .then((alert) =>
+                                        alertProvider.insertItemToList(alert));
                               },
                             ),
                             CountdownTimerWidget()
@@ -292,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         body: Column(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 40,
                             ),
                             Row(
@@ -305,13 +304,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                     onPressed: () {},
                                   ),
-                                  Text('Home',
+                                  const Text('Home',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.normal,
                                       )),
                                 ]),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Expanded(
@@ -319,22 +318,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                 key: alertProvider.listKey,
                                 initialItemCount: alertProvider.items.length,
                                 itemBuilder: (context, position, animation) {
-                                  if (position < alertProvider.items.length) {
-                                    // last item needs padding for bottom sheet
-                                    if (position ==
-                                        alertProvider.items.length - 1) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 80),
-                                        child: buildListItem(context, position,
-                                            animation, alertProvider),
-                                      );
-                                    } else {
-                                      return buildListItem(context, position,
-                                          animation, alertProvider);
-                                    }
+                                  if (position ==
+                                      alertProvider.items.length - 1) {
+                                    return Padding(
+                                      padding:
+                                      const EdgeInsets.only(bottom: 80),
+                                      child: buildListItem(context, position, alertProvider.items[position],
+                                          animation, alertProvider),
+                                    );
                                   } else {
-                                    return Container();
+                                    return buildListItem(context, position, alertProvider.items[position],
+                                        animation, alertProvider);
                                   }
                                 },
                               ),
@@ -345,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildListItem(BuildContext context, int position,
+  Widget buildListItem(BuildContext context, int position, Alert alertToBuild,
       Animation<double> animation, AlertProvider alertProvider) {
     return SizeTransition(
       sizeFactor: animation,
@@ -353,17 +347,25 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildSlidableCard(context, position, animation, alertProvider)
+            buildSlidableCard(context, alertToBuild, position, animation,
+                onItemEditCallback: (Alert? alert) {
+              alertProvider.retrieveAlerts();
+            }, onItemDeleteCallback: (Alert alert) {
+              removeItemWithAnimation(
+                  context, position, alert, animation, alertProvider);
+              AlarmDatabase.instance.delete(alert.id!).then((value) =>
+                  NotificationService().cancelNotification(alert.id!));
+              alertProvider.retrieveAlerts();
+            })
           ]),
     );
   }
 
-  void removeItemWithAnimation(BuildContext context, int position,
+  void removeItemWithAnimation(BuildContext context, int position, Alert alert,
       Animation animation, AlertProvider alertProvider) {
     builder(context, animation) {
-      return buildListItem(context, position, animation, alertProvider);
+      return buildListItem(context, position, alert, animation, alertProvider);
     }
-
-    alertProvider.listKey.currentState?.removeItem(position, builder);
+    alertProvider.removeItemFromList(position, builder: builder);
   }
 }
