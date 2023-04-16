@@ -8,6 +8,9 @@ import 'package:alert_me/ui/component/alert_date_time.dart';
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:workmanager/workmanager.dart';
+import '../../domain/mapper/TimeUtil.dart';
+import '../../domain/util/WorkManager+AlertHelper.dart';
 import '../../usecase/push_notification_service.dart';
 
 class AlertDetailPage extends StatefulWidget {
@@ -23,6 +26,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   _AlertDetailPageState();
 
   late Alert updatedAlert;
+  late Alert currentAlert;
   int _id = 0;
   final _formKey = GlobalKey<FormState>();
   String title = '';
@@ -39,7 +43,7 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
   @override
   void initState() {
     super.initState();
-    Alert currentAlert = widget.alert;
+    currentAlert = widget.alert;
 
     _id = currentAlert.id ?? -1;
     title = currentAlert.title;
@@ -177,18 +181,15 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                                   repeatIntervalTimeInWeeks:
                                       !needToRepeat ? 0 : weekToRepeat);
 
-                              AlarmDatabase.instance
-                                  .update(updatedAlert)
-                                  .then((value) => (value > 0)
-                                      ? NotificationService()
-                                          .cancelNotification(_id)
-                                      : Future.error("Update Failed"))
-                                  .then((value) => needToRepeat
-                                      ? NotificationService()
-                                          .scheduleNotificationFromAlert(
-                                              updatedAlert)
-                                      : Future.error(
-                                          "no more notification needed"));
+                              // Cancel previous in-flight notification and create a new one
+                              if (updatedAlert != currentAlert) {
+                                AlarmDatabase.instance
+                                    .update(updatedAlert)
+                                    .then((value) => (value > 0)
+                                        ? WorkManagerAlertHelper
+                                            .updateExistingNotification(updatedAlert)
+                                        : Future.error);
+                              }
 
                               Navigator.of(context).pop();
                             }

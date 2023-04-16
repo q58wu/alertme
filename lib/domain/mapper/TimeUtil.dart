@@ -8,7 +8,7 @@ class TimeUtil{
   }
 
   static String convertDatetimeToReadableString(DateTime dateTime){
-    return DateFormat.yMMMMEEEEd().format(dateTime);
+    return "${DateFormat.yMMMMEEEEd().format(dateTime)} ${DateFormat.Hm().format(dateTime)}";
   }
 
   static DateTime addDurationToDateTime(DateTime dateTime, int weeks, int days, int hours, int minutes){

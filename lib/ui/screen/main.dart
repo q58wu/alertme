@@ -1,6 +1,7 @@
 import 'package:alert_me/domain/database/alertDatabase.dart';
 import 'package:alert_me/domain/mapper/TimeUtil.dart';
 import 'package:alert_me/domain/model/alert.dart';
+import 'package:alert_me/domain/util/WorkManager+AlertHelper.dart';
 import 'package:alert_me/ui/screen/edit_detail.dart';
 import 'package:alert_me/usecase/push_notification_service.dart';
 import 'package:flutter/material.dart';
@@ -93,14 +94,16 @@ class _MyHomePageState extends State<MyHomePage> {
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(
-                  // An action can be bigger than the others.
-                  backgroundColor: Colors.blueGrey,
-                  foregroundColor: Colors.white,
-                  icon: Icons.skip_next,
-                  label: 'Postpone',
-                  onPressed: (BuildContext context) {},
-                ),
+                if(alertToBuild.isRepeating())
+                  SlidableAction(
+                    // An action can be bigger than the others.
+                    backgroundColor: Colors.blueGrey,
+                    foregroundColor: Colors.white,
+                    icon: Icons.skip_next,
+                    label: 'Postpone',
+                    onPressed: (BuildContext context) {},
+                  ),
+
                 SlidableAction(
                   borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(10),
@@ -175,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         const Icon(Icons.alarm_sharp),
                         const SizedBox(width: 8),
                         Text(
-                          TimeUtil.convertDatetimeToYMMMED(alertToBuild.expireTime),
+                          TimeUtil.convertDatetimeToReadableString(alertToBuild.expireTime),
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
@@ -187,18 +190,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        Chip(
-                          label: const Text('Important'),
-                          backgroundColor: Colors.redAccent[100],
-                        ),
-                        Chip(
-                          label: const Text('Repeating'),
-                          backgroundColor: Colors.greenAccent[100],
-                        ),
-                        Chip(
-                          label: const Text('custom tag'),
-                          backgroundColor: Colors.grey[100],
-                        ),
+                        if (alertToBuild.isImportant)
+                          Chip(
+                            label: Text('Important'),
+                            backgroundColor: Colors.redAccent[100],
+                          ),
+                        if (alertToBuild.isRepeating())
+                          Chip(
+                            label: Text('Repeating'),
+                            backgroundColor: Colors.greenAccent[100],
+                          )
+                        else
+                          Chip(
+                            label: Text('One Off'),
+                            backgroundColor: Colors.grey[100],
+                          )
                       ],
                     ),
                   )
@@ -223,6 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
               backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey),
             ),
             child: const Text("Cancel")),
+        //Delete Button in Slidable
         ElevatedButton(
           onPressed: () async {
             onItemDeleteCallback(alert);
@@ -354,7 +361,7 @@ class _MyHomePageState extends State<MyHomePage> {
               removeItemWithAnimation(
                   context, position, alert, animation, alertProvider);
               AlarmDatabase.instance.delete(alert.id!).then((value) =>
-                  NotificationService().cancelNotification(alert.id!));
+                  WorkManagerAlertHelper.cancelNotificationQueue(alert));
               alertProvider.retrieveAlerts();
             })
           ]),
